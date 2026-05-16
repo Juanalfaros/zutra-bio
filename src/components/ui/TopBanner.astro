@@ -1,0 +1,176 @@
+---
+import { siteConfig } from "@/site-config";
+import { Icon } from "astro-icon/components";
+
+const { promo } = siteConfig;
+if (!promo.enabled) return;
+---
+
+<div class="top-banner" id="top-banner" role="banner" aria-label="Promotional announcement">
+  <div class="top-banner__inner">
+    <p class="top-banner__message">{promo.message}</p>
+    <span class="top-banner__sep" aria-hidden="true">·</span>
+    <a
+      href={promo.cta.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="top-banner__cta"
+    >
+      {promo.cta.label}
+      <Icon name="lucide:arrow-right" width="12" height="12" class="top-banner__cta-icon" />
+    </a>
+  </div>
+
+  {promo.dismissible && (
+    <button
+      class="top-banner__close"
+      id="top-banner-close"
+      aria-label="Dismiss announcement"
+      title="Dismiss"
+    >
+      <Icon name="lucide:x" width="14" height="14" />
+    </button>
+  )}
+</div>
+
+{promo.dismissible && (
+  <script>
+    const BANNER_KEY = "zutrabio-promo-dismissed";
+    const banner = document.getElementById("top-banner");
+    const closeBtn = document.getElementById("top-banner-close");
+
+    if (localStorage.getItem(BANNER_KEY) === "true" && banner) {
+      banner.style.display = "none";
+    }
+
+    closeBtn?.addEventListener("click", () => {
+      if (!banner) return;
+      banner.style.maxHeight = banner.scrollHeight + "px";
+      requestAnimationFrame(() => {
+        banner.classList.add("top-banner--closing");
+      });
+      banner.addEventListener("transitionend", () => {
+        banner.style.display = "none";
+      }, { once: true });
+      localStorage.setItem(BANNER_KEY, "true");
+    });
+  </script>
+)}
+
+<style>
+  .top-banner {
+    position: relative;
+    width: 100%;
+    background: var(--accent);
+    color: var(--accent-fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+    overflow: hidden;
+    max-height: 44px;
+    transition: max-height 0.35s ease, opacity 0.3s ease, padding 0.35s ease;
+    z-index: 200;
+  }
+
+  .top-banner--closing {
+    max-height: 0 !important;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /* Single-row layout — everything inline */
+  .top-banner__inner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .top-banner__message {
+    font-size: 0.75rem;
+    font-weight: 500;
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  /* On wider screens show more of the message */
+  @media (min-width: 480px) {
+    .top-banner__message {
+      font-size: 0.8125rem;
+    }
+  }
+
+  .top-banner__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent-fg);
+    text-decoration: none;
+    border-bottom: 1.5px solid currentColor;
+    padding-bottom: 1px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+  }
+
+  @media (min-width: 480px) {
+    .top-banner__cta { font-size: 0.8125rem; }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .top-banner__cta:hover { opacity: 0.75; }
+  }
+
+  .top-banner__sep {
+    opacity: 0.4;
+    flex-shrink: 0;
+    font-size: 0.75rem;
+  }
+
+  .top-banner__cta-icon {
+    opacity: 0.8;
+  }
+
+  .top-banner__close {
+    position: absolute;
+    right: 0.375rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    color: var(--accent-fg);
+    opacity: 0.6;
+    transition: opacity 0.15s, background 0.15s;
+    flex-shrink: 0;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .top-banner__close:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  /* Entrance animation */
+  .top-banner {
+    animation: bannerSlideDown 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  @keyframes bannerSlideDown {
+    from { max-height: 0; opacity: 0; }
+    to   { max-height: 44px; opacity: 1; }
+  }
+</style>

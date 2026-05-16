@@ -1,0 +1,79 @@
+---
+import type { LinkItem } from "@/types/config";
+import { getPlatformMeta } from "@/utils/platforms";
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  item: LinkItem;
+}
+
+const { item } = Astro.props;
+const meta = getPlatformMeta(item.platform);
+
+const isExternal = item.url.startsWith("http") || item.url.startsWith("//");
+const target = item.newTab !== false && isExternal ? "_blank" : undefined;
+const rel = [
+  isExternal ? "noopener noreferrer" : undefined,
+  item.rel,
+].filter(Boolean).join(" ") || undefined;
+
+const label = item.label || meta.label;
+const isIconifyName = (s?: string) => !!s?.includes(":");
+const customEmoji = item.icon && !isIconifyName(item.icon) ? item.icon : null;
+const iconName = isIconifyName(item.icon) ? item.icon
+  : isIconifyName(meta.icon) ? meta.icon
+  : null;
+
+function hexToRgba(hex: string, alpha: number): string {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+const iconBg = hexToRgba(meta.color, 0.12);
+const iconBgHover = hexToRgba(meta.color, 0.22);
+---
+
+<a
+  href={item.url}
+  class={`link-card ${item.highlight ? "link-card--highlight" : ""}`}
+  target={target}
+  rel={rel}
+  aria-label={`${label}${isExternal ? " (opens in new tab)" : ""}`}
+  data-platform={item.platform}
+  data-gtm-link={label}
+>
+  <!-- Platform icon -->
+  <span
+    class="link-card__icon adaptive-icon"
+    aria-hidden="true"
+    style={`--icon-bg: ${iconBg}; --icon-bg-hover: ${iconBgHover}; --icon-color: ${meta.color}`}
+  >
+    {customEmoji && customEmoji}
+    {iconName && <Icon name={iconName} width="18" height="18" />}
+  </span>
+
+  <!-- Text content -->
+  <span class="link-card__content">
+    <span class="link-card__label">{label}</span>
+    {item.description && (
+      <span class="link-card__desc">{item.description}</span>
+    )}
+  </span>
+
+  <!-- Badge -->
+  {item.badge && (
+    <span class="link-card__badge" aria-label={`Badge: ${item.badge}`}>
+      {item.badge}
+    </span>
+  )}
+
+  <!-- External indicator -->
+  {isExternal && (
+    <span class="link-card__external" aria-hidden="true">
+      <Icon name="lucide:arrow-up-right" width="15" height="15" />
+    </span>
+  )}
+</a>

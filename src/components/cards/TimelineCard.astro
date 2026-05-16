@@ -1,0 +1,137 @@
+---
+import type { TimelineItem } from "@/types/config";
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  item: TimelineItem;
+}
+
+const { item } = Astro.props;
+---
+
+<div class="timeline-card">
+  {item.label && <span class="timeline-card__label">{item.label}</span>}
+  
+  <div class="timeline-card__items">
+    {item.items.map((entry, index) => (
+      <div class="timeline-item">
+        <div class="timeline-item__line-wrapper">
+          <div class="timeline-item__dot">
+            {entry.icon ? <Icon name={entry.icon} width="12" height="12" /> : <div class="dot-inner" />}
+          </div>
+          {index !== item.items.length - 1 && <div class="timeline-item__line" />}
+        </div>
+        
+        <div class="timeline-item__content">
+          <time class="timeline-item__date">{entry.date}</time>
+          <h4 class="timeline-item__title">{entry.title}</h4>
+          {entry.description && <p class="timeline-item__desc">{entry.description}</p>}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .timeline-card {
+    background: var(--bg-card);
+    border: var(--card-border-width) var(--card-border-style) var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1rem;
+    box-shadow: var(--shadow);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  @media (min-width: 480px) {
+    .timeline-card {
+      padding: 1.5rem;
+    }
+  }
+
+  .timeline-card__label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin-bottom: 1.5rem;
+  }
+
+  .timeline-card__items {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .timeline-item__line-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .timeline-item__dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    z-index: 1;
+  }
+
+  .dot-inner {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .timeline-item__line {
+    width: 2px;
+    flex: 1;
+    background: var(--border);
+    opacity: 0.5;
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+
+  .timeline-item__content {
+    padding-bottom: 1.5rem;
+    flex: 1;
+  }
+
+  .timeline-item:last-child .timeline-item__content {
+    padding-bottom: 0;
+  }
+
+  .timeline-item__date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .timeline-item__title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 0.125rem;
+  }
+
+  .timeline-item__desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: 0.375rem;
+  }
+</style>

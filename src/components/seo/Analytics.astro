@@ -1,0 +1,103 @@
+---
+/**
+ * Analytics.astro
+ * Handles all analytics providers based on site-config.ts.
+ * placement="head" → GTM head snippet + others
+ * placement="body" → GTM noscript fallback
+ */
+import { siteConfig } from "@/site-config";
+
+export interface Props {
+  placement: "head" | "body";
+}
+
+const { placement } = Astro.props;
+const { analytics } = siteConfig;
+
+const hasGTM = !!analytics.gtmId;
+const hasCF = !!analytics.cloudflareBeacon;
+const hasUmami = !!analytics.umamiWebsiteId;
+const hasPlausible = !!analytics.plausibleDomain;
+const hasFathom = !!analytics.fathomSiteId;
+---
+
+{placement === "head" && (
+  <>
+    {/* ── Google Tag Manager ── */}
+    {hasGTM && (
+      <script
+        is:inline
+        define:vars={{ gtmId: analytics.gtmId }}
+      >
+        // GTM Head Snippet
+        (function(w,d,s,l,i){
+          w[l]=w[l]||[];
+          w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
+          var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),
+            dl=l!='dataLayer'?'&l='+l:'';
+          j.async=true;
+          j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+          f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer', gtmId);
+      </script>
+    )}
+
+    {/* ── Cloudflare Web Analytics ── */}
+    {hasCF && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={`{"token": "${analytics.cloudflareBeacon}"}`}
+      />
+    )}
+
+    {/* ── Umami ── */}
+    {hasUmami && (
+      <script
+        is:inline
+        defer
+        src={analytics.umamiSrc}
+        data-website-id={analytics.umamiWebsiteId}
+      />
+    )}
+
+    {/* ── Plausible ── */}
+    {hasPlausible && (
+      <script
+        is:inline
+        defer
+        data-domain={analytics.plausibleDomain}
+        src={analytics.plausibleSrc}
+      />
+    )}
+
+    {/* ── Fathom ── */}
+    {hasFathom && (
+      <script
+        is:inline
+        src="https://cdn.usefathom.com/script.js"
+        data-site={analytics.fathomSiteId}
+        defer
+      />
+    )}
+  </>
+)}
+
+{placement === "body" && (
+  <>
+    {/* ── GTM noscript fallback ── */}
+    {hasGTM && (
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${analytics.gtmId}`}
+          height="0"
+          width="0"
+          style="display:none;visibility:hidden"
+          title="Google Tag Manager"
+        />
+      </noscript>
+    )}
+  </>
+)}

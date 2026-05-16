@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zutrabio — User Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
+  <style>
+    /* ── Phosphor icon baseline ── */
+    i[class*="ph-"] {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    /* ── Reset & tokens ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sidebar-w: 260px;
+      --font: 'Inter', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --radius: 8px;
+      --radius-sm: 5px;
+      --accent: #6c47ff;
+      --accent-light: rgba(108,71,255,0.1);
+      --transition: 150ms ease;
+    }
+
+    [data-theme="light"] {
+      --bg:         #f8f7f5;
+      --surface:    #ffffff;
+      --surface-2:  #f3f2f0;
+      --border:     #e8e5e0;
+      --text:       #1a1917;
+      --text-2:     #57534e;
+      --text-3:     #a8a29e;
+      --code-bg:    #1e1b2e;
+      --code-text:  #e0d9ff;
+      --tag-bg:     #f0eeff;
+      --tag-text:   #5b3fd8;
+    }
+
+    [data-theme="dark"] {
+      --bg:         #0f0d1a;
+      --surface:    #18152a;
+      --surface-2:  #211d35;
+      --border:     #2d2850;
+      --text:       #f0eeff;
+      --text-2:     #9b92c8;
+      --text-3:     #5a5380;
+      --code-bg:    #0c0a18;
+      --code-text:  #e0d9ff;
+      --tag-bg:     rgba(108,71,255,0.15);
+      --tag-text:   #a58bff;
+    }
+
+    html { font-family: var(--font); font-size: 15px; color: var(--text); background: var(--bg); scroll-behavior: smooth; }
+    body { display: flex; min-height: 100vh; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    img { max-width: 100%; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: transform var(--transition);
+    }
+
+    .sidebar__logo {
+      padding: 1.25rem 1.25rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar__logo-text {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .sidebar__logo-text i[class*="ph-"] { font-size: 1.125rem; color: var(--accent); }
+
+    .sidebar__logo-badge {
+      font-size: 0.625rem;
+      font-weight: 700;
+      background: var(--accent);
+      color: #fff;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+    }
+
+    .sidebar__nav { padding: 1rem 0.75rem; flex: 1; }
+
+    .nav-section { margin-bottom: 1.5rem; }
+
+    .nav-section__label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--text-3);
+      padding: 0 0.5rem;
+      margin-bottom: 0.375rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.625rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-2);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background var(--transition), color var(--transition);
+      text-decoration: none;
+    }
+
+    .nav-link:hover { background: var(--surface-2); color: var(--text); text-decoration: none; }
+    .nav-link.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+
+    .nav-link__dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+
+    .sidebar__footer {
+      padding: 1rem 1.25rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .sidebar__footer a {
+      font-size: 0.8125rem;
+      color: var(--text-2);
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      text-decoration: none;
+    }
+
+    .sidebar__footer a:hover { color: var(--accent); }
+
+    /* ── Top bar (mobile) ── */
+    .topbar {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 56px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1rem;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 200;
+    }
+
+    .topbar__title { font-size: 0.9375rem; font-weight: 700; color: var(--text); }
+
+    .topbar__menu {
+      background: none;
+      border: none;
+      color: var(--text-2);
+      cursor: pointer;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+    }
+    .topbar__menu i[class*="ph-"] { font-size: 1.375rem; }
+
+    /* ── Main content ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .content {
+      max-width: 780px;
+      margin-inline: auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    /* ── Theme toggle ── */
+    .theme-toggle {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 3.5rem;
+      height: 1.75rem;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .theme-toggle__track {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 0.35rem;
+      font-size: 0.7rem;
+      color: var(--text-2);
+      pointer-events: none;
+      gap: 0;
+    }
+    .theme-toggle__thumb {
+      position: absolute;
+      top: 0.2rem;
+      left: 0.2rem;
+      width: 1.3rem;
+      height: 1.3rem;
+      border-radius: 50%;
+      background: var(--accent, #6c47ff);
+      transition: transform 0.22s cubic-bezier(.4,0,.2,1), background 0.2s;
+      pointer-events: none;
+    }
+    /* dark mode: thumb slides to the right */
+    [data-theme="dark"] .theme-toggle__thumb {
+      transform: translateX(1.75rem);
+      background: #a78bfa;
+    }
+    .theme-toggle:hover { border-color: var(--accent, #6c47ff); }
+
+    /* ── Sections ── */
+    .section { margin-bottom: 4rem; }
+
+    .section-anchor {
+      display: block;
+      height: 0;
+      margin-top: -80px;
+      padding-top: 80px;
+      visibility: hidden;
+    }
+
+    /* ── Typography ── */
+    h1 { font-size: 2rem; font-weight: 700; line-height: 1.15; margin-bottom: 0.625rem; }
+    h2 { font-size: 1.375rem; font-weight: 700; margin-bottom: 1rem; margin-top: 2.5rem; padding-bottom: 0.625rem; border-bottom: 1px solid var(--border); }
+    h3 { font-size: 1.0625rem; font-weight: 600; margin-bottom: 0.625rem; margin-top: 1.5rem; color: var(--text); }
+    h4 { font-size: 0.9375rem; font-weight: 600; margin-bottom: 0.375rem; margin-top: 1.25rem; color: var(--text-2); }
+    p { line-height: 1.7; color: var(--text-2); margin-bottom: 0.875rem; }
+    ul, ol { padding-left: 1.375rem; color: var(--text-2); line-height: 1.7; margin-bottom: 0.875rem; }
+    li { margin-bottom: 0.25rem; }
+    strong { color: var(--text); font-weight: 600; }
+
+    .lead {
+      font-size: 1.0625rem;
+      color: var(--text-2);
+      line-height: 1.65;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .hero__title { font-size: 1.75rem; font-weight: 700; }
+    .hero__sub { color: var(--text-2); line-height: 1.6; margin: 0; }
+
+    .hero__actions { display: flex; gap: 0.625rem; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5625rem 1.125rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover { opacity: 0.85; text-decoration: none; }
+
+    .btn--primary { background: var(--accent); color: #fff; }
+    .btn--ghost { background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border); }
+
+    /* ── Code blocks ── */
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: var(--radius);
+      padding: 1.125rem 1.25rem;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      line-height: 1.7;
+      margin: 0.875rem 0 1.25rem;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      background: var(--surface-2);
+      color: var(--accent);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      font-size: inherit;
+    }
+
+    /* Syntax colors */
+    .kw  { color: #c084fc; }
+    .str { color: #86efac; }
+    .cm  { color: #6b7280; font-style: italic; }
+    .kv  { color: #93c5fd; }
+    .val { color: #fca5a5; }
+    .bool{ color: #f9a8d4; }
+    .fn  { color: #fcd34d; }
+
+    /* ── Callouts ── */
+    .callout {
+      border-radius: var(--radius);
+      padding: 1rem 1.125rem;
+      margin: 1rem 0 1.5rem;
+      border-left: 3px solid;
+      display: flex;
+      gap: 0.625rem;
+    }
+
+    .callout--tip   { background: rgba(34,197,94,0.08); border-color: #22c55e; }
+    .callout--info  { background: rgba(108,71,255,0.08); border-color: var(--accent); }
+    .callout--warn  { background: rgba(251,146,60,0.08); border-color: #f97316; }
+
+    .callout__icon { font-size: 1.125rem; flex-shrink: 0; line-height: 1; margin-top: 1px; }
+    .hidden { display: none; }
+    .callout__body { font-size: 0.875rem; line-height: 1.6; color: var(--text-2); }
+    .callout__body p { margin: 0; color: inherit; }
+    .callout__body strong { color: var(--text); }
+
+    /* ── Tags / Badges ── */
+    .tag {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+    }
+
+    .tag--green { background: rgba(34,197,94,0.12); color: #16a34a; }
+    .tag--orange{ background: rgba(251,146,60,0.12); color: #c2410c; }
+    .tag--gray  { background: var(--surface-2); color: var(--text-3); border: 1px solid var(--border); }
+
+    [data-theme="dark"] .tag--green  { color: #4ade80; }
+    [data-theme="dark"] .tag--orange { color: #fb923c; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 0.875rem 0 1.5rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    th {
+      text-align: left;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-3);
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 0.625rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-2);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface-2); }
+
+    td code { font-size: 0.75rem; }
+
+    /* ── Cards (block type previews) ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .block-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .block-card__icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .block-card__name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .block-card__desc {
+      font-size: 0.8125rem;
+      color: var(--text-3);
+      line-height: 1.5;
+    }
+
+    .block-card__tag {
+      margin-top: auto;
+      padding-top: 0.5rem;
+    }
+
+    /* ── Platform pills ── */
+    .platform-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+      margin: 0.75rem 0 1.25rem;
+    }
+
+    .platform-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.3rem 0.625rem;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-2);
+    }
+
+    .platform-pill__dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: 0; margin: 1rem 0 1.5rem; }
+
+    .step {
+      display: flex;
+      gap: 1rem;
+      position: relative;
+      padding-bottom: 1.5rem;
+    }
+
+    .step:last-child { padding-bottom: 0; }
+
+    .step__num {
+      width: 1.875rem;
+      height: 1.875rem;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step__line {
+      position: absolute;
+      left: 0.9375rem;
+      top: 1.875rem;
+      bottom: 0;
+      width: 1px;
+      background: var(--border);
+      transform: translateX(-50%);
+    }
+
+    .step:last-child .step__line { display: none; }
+
+    .step__body { flex: 1; padding-top: 0.2rem; }
+    .step__title { font-size: 0.9375rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+    .step__desc { font-size: 0.875rem; color: var(--text-2); line-height: 1.6; }
+
+    /* ── Theme swatches ── */
+    .theme-swatches { display: flex; gap: 0.75rem; flex-wrap: wrap; margin: 1rem 0 1.5rem; }
+
+    .theme-swatch {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .theme-swatch__preview {
+      width: 100%;
+      height: 60px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.625rem;
+    }
+
+    .theme-swatch__name { font-size: 0.875rem; font-weight: 600; color: var(--text); }
+    .theme-swatch__meta { font-size: 0.75rem; color: var(--text-3); margin-top: 0.125rem; }
+
+    /* ── Profile cards ── */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.625rem;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .profile-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+
+    .profile-card__emoji { font-size: 1.5rem; margin-bottom: 0.375rem; color: var(--accent); line-height: 1; }
+    .profile-card__name { font-size: 0.875rem; font-weight: 600; color: var(--text); }
+    .profile-card__key { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); margin-top: 0.125rem; }
+    .profile-card__desc { font-size: 0.8125rem; color: var(--text-3); margin-top: 0.375rem; line-height: 1.5; }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+    /* ── Mobile sidebar overlay ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 99;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .sidebar-overlay.open {
+        display: block;
+      }
+      .topbar {
+        display: flex;
+      }
+      .main {
+        margin-left: 0;
+        padding-top: 56px;
+      }
+      .content {
+        padding: 2rem 1.25rem 4rem;
+      }
+      h1 { font-size: 1.625rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="overlay"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar__logo">
+    <span class="sidebar__logo-text">
+      <i class="ph-bold ph-link-simple"></i> Zutrabio
+      <span class="sidebar__logo-badge">v1.1</span>
+    </span>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle theme" aria-label="Toggle color mode">
+      <span class="theme-toggle__track">
+        <i class="ph-bold ph-sun"></i>
+        <i class="ph-bold ph-moon"></i>
+      </span>
+      <span class="theme-toggle__thumb"></span>
+    </button>
+  </div>
+
+  <nav class="sidebar__nav">
+    <div class="nav-section">
+      <div class="nav-section__label">Getting Started</div>
+      <a href="#overview"    class="nav-link active"><span class="nav-link__dot"></span> Overview</a>
+      <a href="#quickstart"  class="nav-link"><span class="nav-link__dot"></span> Quick Start</a>
+      <a href="#structure"   class="nav-link"><span class="nav-link__dot"></span> File Structure</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section__label">Configuration</div>
+      <a href="#config"      class="nav-link"><span class="nav-link__dot"></span> site-config.ts</a>
+      <a href="#identity"    class="nav-link"><span class="nav-link__dot"></span> Identity</a>
+      <a href="#promo"       class="nav-link"><span class="nav-link__dot"></span> Promo Banner</a>
+      <a href="#theme"       class="nav-link"><span class="nav-link__dot"></span> Themes & Colors</a>
+      <a href="#seo"         class="nav-link"><span class="nav-link__dot"></span> SEO</a>
+      <a href="#analytics"   class="nav-link"><span class="nav-link__dot"></span> Analytics</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section__label">Content</div>
+      <a href="#profiles"    class="nav-link"><span class="nav-link__dot"></span> Profiles</a>
+      <a href="#blocks"      class="nav-link"><span class="nav-link__dot"></span> Block Types</a>
+      <a href="#platforms"   class="nav-link"><span class="nav-link__dot"></span> Platforms (50+)</a>
+      <a href="#gallery"     class="nav-link"><span class="nav-link__dot"></span> Image Gallery</a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section__label">Deploy</div>
+      <a href="#deploy"      class="nav-link"><span class="nav-link__dot"></span> Cloudflare Pages</a>
+      <a href="#faq"         class="nav-link"><span class="nav-link__dot"></span> FAQ</a>
+    </div>
+  </nav>
+
+  <div class="sidebar__footer">
+    <a href="https://zutra.gumroad.com/l/zutrabio" target="_blank"><i class="ph-bold ph-shopping-cart-simple"></i> Get Zutrabio on Gumroad</a>
+    <a href="https://zutra.agency/recursos"         target="_blank"><i class="ph-bold ph-package"></i> Free Resources</a>
+    <a href="https://astro.build/themes/author/2995" target="_blank"><i class="ph-bold ph-rocket"></i> More Astro Themes</a>
+  </div>
+</aside>
+
+<!-- Mobile topbar -->
+<div class="topbar">
+  <button class="topbar__menu" id="menu-btn" aria-label="Open menu">
+    <i class="ph-bold ph-list"></i>
+  </button>
+  <span class="topbar__title"><i class="ph-bold ph-link-simple"></i> Zutrabio Docs</span>
+  <button class="theme-toggle" id="theme-toggle-mobile" aria-label="Toggle color mode">
+    <span class="theme-toggle__track">
+      <i class="ph-bold ph-sun"></i>
+      <i class="ph-bold ph-moon"></i>
+    </span>
+    <span class="theme-toggle__thumb"></span>
+  </button>
+</div>
+
+<!-- Main content -->
+<main class="main">
+  <div class="content">
+
+    <!-- ══ OVERVIEW ══════════════════════════════════════════════ -->
+    <span class="section-anchor" id="overview"></span>
+    <div class="section">
+      <div class="hero">
+        <div>
+          <div class="hero__title"><i class="ph-bold ph-link-simple"></i> Zutrabio — User Guide</div>
+          <p class="hero__sub">Everything you need to set up, customize, and deploy your link-in-bio page. No framework experience required.</p>
+        </div>
+        <div class="hero__actions">
+          <a href="https://zutra.gumroad.com/l/zutrabio" target="_blank" class="btn btn--primary">Download on Gumroad</a>
+          <a href="https://zutra.agency/recursos"         target="_blank" class="btn btn--ghost">Free Resources →</a>
+        </div>
+      </div>
+
+      <h2>What is Zutrabio?</h2>
+      <p>Zutrabio is a production-ready <strong>Link in Bio theme</strong> built with Astro 6. It comes with three visual themes, six ready-to-use persona profiles, 50+ platform integrations, full SEO, analytics support, and one-click deploy to Cloudflare Pages — all configurable from a single file.</p>
+
+      <div class="card-grid">
+        <div class="block-card">
+          <div class="block-card__icon"><i class="ph-bold ph-paint-brush"></i></div>
+          <div class="block-card__name">3 Visual Themes</div>
+          <div class="block-card__desc">Minimal, Modern (glassmorphism), Neobrutalist — each with light & dark mode.</div>
+        </div>
+        <div class="block-card">
+          <div class="block-card__icon"><i class="ph-bold ph-user"></i></div>
+          <div class="block-card__name">6 Profiles Included</div>
+          <div class="block-card__desc">Freelancer, Creator, Musician, Founder, Professional, Local Business.</div>
+        </div>
+        <div class="block-card">
+          <div class="block-card__icon"><i class="ph-bold ph-link-simple"></i></div>
+          <div class="block-card__name">50+ Platforms</div>
+          <div class="block-card__desc">Instagram, GitHub, Spotify, Gumroad, Calendly, and many more.</div>
+        </div>
+        <div class="block-card">
+          <div class="block-card__icon"><i class="ph-bold ph-magnifying-glass"></i></div>
+          <div class="block-card__name">Full SEO Stack</div>
+          <div class="block-card__desc">Open Graph, Twitter Cards, Schema.org JSON-LD, sitemap, hreflang.</div>
+        </div>
+        <div class="block-card">
+          <div class="block-card__icon"><i class="ph-bold ph-cloud"></i></div>
+          <div class="block-card__name">Cloudflare Ready</div>
+          <div class="block-card__desc">Deploy to Cloudflare Pages free tier in under 5 minutes.</div>
+        </div>
+        <div class="block-card">
+          <div class="block-card__icon"><i class="ph-bold ph-gear"></i></div>
+          <div class="block-card__name">One Config File</div>
+          <div class="block-card__desc">Everything editable from <code>site-config.ts</code>. No framework knowledge needed.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ QUICK START ════════════════════════════════════════════ -->
+    <span class="section-anchor" id="quickstart"></span>
+    <div class="section">
+      <h2>Quick Start</h2>
+      <p>Get your page running locally in under 2 minutes.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step__num">1</div>
+          <div class="step__line"></div>
+          <div class="step__body">
+            <div class="step__title">Install dependencies</div>
+            <div class="step__desc">Requires Node.js 18+ and pnpm (or npm).</div>
+            <pre><code>pnpm install
+<span class="cm"># or: npm install</span></code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">2</div>
+          <div class="step__line"></div>
+          <div class="step__body">
+            <div class="step__title">Start the dev server</div>
+            <pre><code>pnpm dev
+<span class="cm"># Opens http://localhost:4321</span></code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">3</div>
+          <div class="step__line"></div>
+          <div class="step__body">
+            <div class="step__title">Edit your config</div>
+            <div class="step__desc">Open <code>src/site-config.ts</code> and fill in your identity, links, and content. The page hot-reloads on every save.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">4</div>
+          <div class="step__line"></div>
+          <div class="step__body">
+            <div class="step__title">Build for production</div>
+            <pre><code>pnpm build
+<span class="cm"># Output goes to dist/</span></code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">5</div>
+          <div class="step__body">
+            <div class="step__title">Deploy</div>
+            <div class="step__desc">Push to GitHub and connect to Cloudflare Pages. See the <a href="#deploy">Deploy section</a> for step-by-step instructions.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FILE STRUCTURE ════════════════════════════════════════ -->
+    <span class="section-anchor" id="structure"></span>
+    <div class="section">
+      <h2>File Structure</h2>
+      <p>You only need to touch files marked <span class="tag tag--green">Edit</span>. Everything else is internal.</p>
+
+      <pre><code>zutrabio/
+├── src/
+│   ├── <span class="fn">site-config.ts</span>          <span class="cm">← Your main config (identity, theme, SEO…)</span>
+│   ├── <span class="fn">profiles/</span>               <span class="cm">← One file per persona — edit or create your own</span>
+│   │   ├── freelancer.ts
+│   │   ├── creator.ts
+│   │   ├── musician.ts
+│   │   ├── founder.ts
+│   │   ├── professional.ts
+│   │   └── localbusiness.ts
+│   ├── types/config.ts         <span class="cm">← TypeScript types (don't edit)</span>
+│   ├── layouts/BaseLayout.astro
+│   ├── pages/
+│   │   ├── index.astro         <span class="cm">← Main page</span>
+│   │   └── changelog.astro     <span class="cm">← Release history</span>
+│   ├── components/             <span class="cm">← All UI components (don't edit)</span>
+│   ├── utils/platforms.ts      <span class="cm">← 50+ platform icons/colors</span>
+│   └── styles/global.css       <span class="cm">← Global styles (3 themes × 2 modes)</span>
+├── public/
+│   └── og/                     <span class="cm">← OG images (replace with yours)</span>
+├── docs/
+│   └── index.html              <span class="cm">← This guide</span>
+├── astro.config.ts
+└── wrangler.toml               <span class="cm">← Cloudflare Pages config</span></code></pre>
+
+      <div class="callout callout--tip">
+        <div class="callout__icon"><i class="ph-fill ph-lightbulb"></i></div>
+        <div class="callout__body"><strong>Rule of thumb:</strong> 90% of customization happens in <code>src/site-config.ts</code> and your active profile file in <code>src/profiles/</code>. You rarely need to touch anything else.</div>
+      </div>
+    </div>
+
+    <!-- ══ SITE-CONFIG ═══════════════════════════════════════════ -->
+    <span class="section-anchor" id="config"></span>
+    <div class="section">
+      <h2>site-config.ts</h2>
+      <p>The single source of truth. Every section is documented inline — here's an annotated overview.</p>
+
+      <pre><code><span class="cm">// ── 1. Active profile ──────────────────────────────────</span>
+<span class="kw">export</span> { pageItems } <span class="kw">from</span> <span class="str">"./profiles/freelancer"</span>;
+<span class="cm">// Options: freelancer | creator | musician | founder | professional | localbusiness</span>
+
+<span class="cm">// ── 2. The full config ─────────────────────────────────</span>
+<span class="kw">export const</span> <span class="fn">siteConfig</span>: SiteConfig = {
+
+  identity: { <span class="cm">/* your name, avatar, banner, bio… */</span> },
+
+  siteUrl: <span class="str">"https://yoursite.com"</span>,
+
+  promo: {
+    enabled: <span class="bool">true</span>,
+    message: <span class="str">"✨ My new course is live!"</span>,
+    cta: { label: <span class="str">"Check it out"</span>, url: <span class="str">"https://..."</span> },
+    dismissible: <span class="bool">true</span>,
+  },
+
+  theme: {
+    default: <span class="str">"modern"</span>,     <span class="cm">// "minimal" | "modern" | "neobrutalist"</span>
+    colorMode: <span class="str">"system"</span>,  <span class="cm">// "light" | "dark" | "system"</span>
+    accentColors: { modern: <span class="str">"#6c47ff"</span> },
+    showThemeSwitcher: <span class="bool">true</span>,
+  },
+
+  analytics: { gtmId: <span class="str">"GTM-XXXXXXX"</span>, <span class="cm">/* …other providers */</span> },
+  seo:       { title: <span class="str">"Jane Doe — Designer"</span>, <span class="cm">/* … */</span> },
+  openGraph: { image: <span class="str">"/og/og-default.jpg"</span>, <span class="cm">/* … */</span> },
+  features:  { showPoweredBy: <span class="bool">true</span>, animateCards: <span class="bool">true</span>, <span class="cm">/* … */</span> },
+  footer:    { copyright: <span class="str">""</span>, links: [] },
+};</code></pre>
+    </div>
+
+    <!-- ══ IDENTITY ══════════════════════════════════════════════ -->
+    <span class="section-anchor" id="identity"></span>
+    <div class="section">
+      <h2>Identity</h2>
+      <p>Controls the profile header — name, avatar, banner image, bio, location, and timezone.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>type</code></td><td><code>"person" | "organization"</code></td><td>Affects Schema.org output</td></tr>
+            <tr><td><code>name</code></td><td><code>string</code></td><td>Display name shown in header</td></tr>
+            <tr><td><code>handle</code></td><td><code>string</code></td><td>Username shown below name, e.g. <code>@janedoe</code></td></tr>
+            <tr><td><code>bio</code></td><td><code>string</code></td><td>Short bio line (plain text)</td></tr>
+            <tr><td><code>bioExtended</code></td><td><code>string</code></td><td>Optional second bio line</td></tr>
+            <tr><td><code>avatar</code></td><td><code>string</code></td><td>URL to your profile photo (192×192 recommended)</td></tr>
+            <tr><td><code>banner</code></td><td><code>string?</code></td><td>Optional full-width hero image. Remove the field to disable.</td></tr>
+            <tr><td><code>location</code></td><td><code>string</code></td><td>Shown with a pin icon, e.g. <code>"Santiago, Chile 🇨🇱"</code></td></tr>
+            <tr><td><code>pronouns</code></td><td><code>string</code></td><td>Shown next to handle, leave empty to hide</td></tr>
+            <tr><td><code>timezone</code></td><td><code>string</code></td><td>IANA timezone, e.g. <code>"America/Santiago"</code>. Used in the clock widget.</td></tr>
+            <tr><td><code>verificationLinks</code></td><td><code>string[]</code></td><td>Mastodon / Fediverse <code>rel="me"</code> URLs</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout--tip">
+        <div class="callout__icon"><i class="ph-fill ph-image"></i></div>
+        <div class="callout__body"><strong>Banner tip:</strong> Use a landscape image at least 1200×400px. Unsplash URLs work great. The image gets a subtle gradient overlay automatically.</div>
+      </div>
+    </div>
+
+    <!-- ══ PROMO BANNER ══════════════════════════════════════════ -->
+    <span class="section-anchor" id="promo"></span>
+    <div class="section">
+      <h2>Promo Banner</h2>
+      <p>A dismissible announcement strip shown at the very top of the page. Visitors can close it — the choice is saved in localStorage.</p>
+
+      <pre><code>promo: {
+  enabled: <span class="bool">true</span>,     <span class="cm">// set false to hide completely</span>
+  message: <span class="str">"✨ My new course is live!"</span>,
+  cta: {
+    label: <span class="str">"Enroll now"</span>,
+    url:   <span class="str">"https://gumroad.com/..."</span>,
+  },
+  dismissible: <span class="bool">true</span>,  <span class="cm">// show the × close button</span>
+},</code></pre>
+
+      <p>The banner inherits the active theme's <strong>accent color</strong> as background — so it always looks on-brand without extra configuration.</p>
+    </div>
+
+    <!-- ══ THEMES ════════════════════════════════════════════════ -->
+    <span class="section-anchor" id="theme"></span>
+    <div class="section">
+      <h2>Themes &amp; Colors</h2>
+
+      <div class="theme-swatches">
+        <div class="theme-swatch">
+          <div class="theme-swatch__preview" style="background: linear-gradient(135deg, #f7f5f2 50%, #18181b 50%); border: 1px solid #e8e5e1;"></div>
+          <div class="theme-swatch__name">Minimal</div>
+          <div class="theme-swatch__meta">Clean · Serif · Editorial</div>
+        </div>
+        <div class="theme-swatch">
+          <div class="theme-swatch__preview" style="background: linear-gradient(135deg, #f0f0ff 0%, #fce4ff 50%, #e8f4ff 100%); border: 1px solid rgba(120,100,220,0.2);"></div>
+          <div class="theme-swatch__name">Modern</div>
+          <div class="theme-swatch__meta">Glass · Vivid · Gradients</div>
+        </div>
+        <div class="theme-swatch">
+          <div class="theme-swatch__preview" style="background: #f5f0e8; border: 2px solid #000; border-radius: 0;"></div>
+          <div class="theme-swatch__name">Neobrutalist</div>
+          <div class="theme-swatch__meta">Bold · Flat · Raw energy</div>
+        </div>
+      </div>
+
+      <h3>Default theme &amp; color mode</h3>
+      <pre><code>theme: {
+  default: <span class="str">"modern"</span>,    <span class="cm">// "minimal" | "modern" | "neobrutalist"</span>
+  colorMode: <span class="str">"system"</span>, <span class="cm">// "light" | "dark" | "system"</span>
+},</code></pre>
+
+      <h3>Custom accent color</h3>
+      <p>Override the accent color for any theme. Leave a key out to keep the built-in default.</p>
+      <pre><code>accentColors: {
+  <span class="kv">minimal</span>:      <span class="str">"#18181b"</span>, <span class="cm">// default: near-black</span>
+  <span class="kv">modern</span>:       <span class="str">"#6c47ff"</span>, <span class="cm">// default: vivid purple</span>
+  <span class="kv">neobrutalist</span>: <span class="str">"#ff6b35"</span>, <span class="cm">// default: orange</span>
+},</code></pre>
+
+      <div class="callout callout--info">
+        <div class="callout__icon"><i class="ph-fill ph-info"></i></div>
+        <div class="callout__body"><strong>Hex only.</strong> The foreground (white/black text on the accent) is computed automatically from the color's luminance — you don't need to set it.</div>
+      </div>
+
+      <h3>Hiding the theme switcher</h3>
+      <p>Once you've chosen your final look, hide the floating switcher so visitors can't change it:</p>
+      <pre><code>showThemeSwitcher: <span class="bool">false</span>,</code></pre>
+
+      <p>The switcher appears as a palette icon in the top-right corner on mobile and as a "Themes" pill in the bottom-left on desktop.</p>
+    </div>
+
+    <!-- ══ SEO ═══════════════════════════════════════════════════ -->
+    <span class="section-anchor" id="seo"></span>
+    <div class="section">
+      <h2>SEO</h2>
+      <p>Zutrabio generates a comprehensive SEO head automatically. You only need to fill in a few fields.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>seo.title</code></td><td>Page <code>&lt;title&gt;</code> — shown in browser tab and search results</td></tr>
+            <tr><td><code>seo.description</code></td><td>Meta description — shown in search results under the title</td></tr>
+            <tr><td><code>seo.keywords</code></td><td>Array of keywords, e.g. <code>["designer", "chile"]</code></td></tr>
+            <tr><td><code>openGraph.image</code></td><td>OG image path, e.g. <code>"/og/og-default.jpg"</code> (1200×630px)</td></tr>
+            <tr><td><code>twitter.creator</code></td><td>Your Twitter handle for Card attribution</td></tr>
+            <tr><td><code>schema.person.jobTitle</code></td><td>Used in Schema.org JSON-LD structured data</td></tr>
+            <tr><td><code>geo.enabled</code></td><td>Set <code>true</code> for local businesses to add geo meta tags</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ ANALYTICS ═════════════════════════════════════════════ -->
+    <span class="section-anchor" id="analytics"></span>
+    <div class="section">
+      <h2>Analytics</h2>
+      <p>All providers are optional. Add your ID to enable, leave blank (<code>""</code>) to disable.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Provider</th><th>Config key</th><th>How to get your ID</th></tr></thead>
+          <tbody>
+            <tr><td>Google Tag Manager</td><td><code>gtmId</code></td><td>Create a container at tagmanager.google.com → Container ID looks like <code>GTM-XXXXXXX</code></td></tr>
+            <tr><td>Cloudflare Web Analytics</td><td><code>cloudflareBeacon</code></td><td>Dashboard → Analytics & Logs → Web Analytics → Add site → Get beacon token</td></tr>
+            <tr><td>Umami</td><td><code>umamiWebsiteId</code></td><td>Self-hosted or umami.is — Website ID from settings</td></tr>
+            <tr><td>Plausible</td><td><code>plausibleDomain</code></td><td>Your domain as registered in plausible.io, e.g. <code>"janedoe.com"</code></td></tr>
+            <tr><td>Fathom</td><td><code>fathomSiteId</code></td><td>8-character site ID from usefathom.com dashboard</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout--tip">
+        <div class="callout__icon"><i class="ph-fill ph-lightbulb"></i></div>
+        <div class="callout__body"><strong>Recommendation:</strong> If you're on Cloudflare Pages, use the built-in <strong>Cloudflare Web Analytics</strong> — it's free, privacy-friendly, and requires no script loading (beacon only).</div>
+      </div>
+    </div>
+
+    <!-- ══ PROFILES ══════════════════════════════════════════════ -->
+    <span class="section-anchor" id="profiles"></span>
+    <div class="section">
+      <h2>Profiles</h2>
+      <p>Each profile is a standalone <code>.ts</code> file in <code>src/profiles/</code>. Switch the active one with a single import line in <code>site-config.ts</code>.</p>
+
+      <pre><code><span class="cm">// Change this line to switch profiles:</span>
+<span class="kw">export</span> { pageItems } <span class="kw">from</span> <span class="str">"./profiles/creator"</span>;</code></pre>
+
+      <div class="profile-grid">
+        <div class="profile-card">
+          <div class="profile-card__emoji"><i class="ph-bold ph-briefcase"></i></div>
+          <div class="profile-card__name">Freelancer</div>
+          <div class="profile-card__key">profiles/freelancer.ts</div>
+          <div class="profile-card__desc">Designer / dev — portfolio, services, social links, testimonial.</div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-card__emoji"><i class="ph-bold ph-microphone"></i></div>
+          <div class="profile-card__name">Creator</div>
+          <div class="profile-card__key">profiles/creator.ts</div>
+          <div class="profile-card__desc">Tech content creator — YouTube, newsletter, courses, sponsors.</div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-card__emoji"><i class="ph-bold ph-music-note"></i></div>
+          <div class="profile-card__name">Musician</div>
+          <div class="profile-card__key">profiles/musician.ts</div>
+          <div class="profile-card__desc">Artist — Spotify embed, shows, ticketing, merch, support.</div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-card__emoji"><i class="ph-bold ph-rocket"></i></div>
+          <div class="profile-card__name">Founder</div>
+          <div class="profile-card__key">profiles/founder.ts</div>
+          <div class="profile-card__desc">Indie hacker — building in public, SaaS, GitHub, community.</div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-card__emoji"><i class="ph-bold ph-trophy"></i></div>
+          <div class="profile-card__name">Professional</div>
+          <div class="profile-card__key">profiles/professional.ts</div>
+          <div class="profile-card__desc">Corporate — timeline, certifications, awards, mentoring.</div>
+        </div>
+        <div class="profile-card">
+          <div class="profile-card__emoji"><i class="ph-bold ph-coffee"></i></div>
+          <div class="profile-card__name">Local Business</div>
+          <div class="profile-card__key">profiles/localbusiness.ts</div>
+          <div class="profile-card__desc">Café / restaurant — menu, delivery, reservations, hours.</div>
+        </div>
+      </div>
+
+      <h3>Creating a custom profile</h3>
+      <p>Duplicate any existing profile and edit it:</p>
+      <pre><code><span class="cm"># 1. Copy a profile</span>
+cp src/profiles/freelancer.ts src/profiles/myprofile.ts
+
+<span class="cm"># 2. Edit the file with your content</span>
+
+<span class="cm"># 3. Activate it in site-config.ts</span>
+<span class="kw">export</span> { pageItems } <span class="kw">from</span> <span class="str">"./profiles/myprofile"</span>;</code></pre>
+    </div>
+
+    <!-- ══ BLOCK TYPES ════════════════════════════════════════════ -->
+    <span class="section-anchor" id="blocks"></span>
+    <div class="section">
+      <h2>Block Types</h2>
+      <p>Every item in the <code>pageItems</code> array has a <code>type</code> field. Here's a reference for each type.</p>
+
+      <h3>link <span class="tag">Most used</span></h3>
+      <pre><code>{
+  <span class="kv">type</span>: <span class="str">"link"</span>,
+  <span class="kv">platform</span>: <span class="str">"github"</span>,        <span class="cm">// see Platforms section for all values</span>
+  <span class="kv">label</span>: <span class="str">"My GitHub"</span>,         <span class="cm">// override the platform's default label</span>
+  <span class="kv">url</span>: <span class="str">"https://github.com/you"</span>,
+  <span class="kv">description</span>: <span class="str">"Open source"</span>, <span class="cm">// optional subtitle shown below label</span>
+  <span class="kv">highlight</span>: <span class="bool">true</span>,           <span class="cm">// accent background — use for main CTAs</span>
+  <span class="kv">width</span>: <span class="str">"half"</span>,             <span class="cm">// "full" (default) or "half" — half-width links sit side by side</span>
+  <span class="kv">icon</span>: <span class="str">"lucide:star"</span>,        <span class="cm">// override the platform icon (Lucide or Simple Icons name)</span>
+  <span class="kv">enabled</span>: <span class="bool">true</span>,
+}</code></pre>
+
+      <h3>text-block</h3>
+      <pre><code>{
+  <span class="kv">type</span>: <span class="str">"text-block"</span>,
+  <span class="kv">style</span>: <span class="str">"announcement"</span>, <span class="cm">// "card" | "bento" | "announcement"</span>
+  <span class="kv">label</span>: <span class="str">"New course dropping!"</span>,
+  <span class="kv">content</span>: <span class="str">"Use code &lt;strong&gt;EARLY40&lt;/strong&gt; for 40% off."</span>, <span class="cm">// HTML supported</span>
+  <span class="kv">enabled</span>: <span class="bool">true</span>,
+}</code></pre>
+
+      <h3>section-header &amp; divider</h3>
+      <pre><code>{ <span class="kv">type</span>: <span class="str">"section-header"</span>, <span class="kv">label</span>: <span class="str">"Find me"</span> }
+
+{ <span class="kv">type</span>: <span class="str">"divider"</span>, <span class="kv">style</span>: <span class="str">"line"</span> } <span class="cm">// "line" | "dots" | "fade"</span></code></pre>
+
+      <h3>rich-media</h3>
+      <pre><code>{
+  <span class="kv">type</span>: <span class="str">"rich-media"</span>,
+  <span class="kv">mediaType</span>: <span class="str">"youtube-video"</span>,  <span class="cm">// see table below</span>
+  <span class="kv">label</span>: <span class="str">"My latest video"</span>,
+  <span class="kv">url</span>: <span class="str">"https://youtube.com/watch?v=..."</span>,
+  <span class="kv">description</span>: <span class="str">"Optional caption"</span>,
+  <span class="kv">enabled</span>: <span class="bool">true</span>,
+}</code></pre>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>mediaType</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>youtube-video</code></td><td>YouTube embed (nocookie domain)</td></tr>
+            <tr><td><code>vimeo-video</code></td><td>Vimeo embed (DNT enabled)</td></tr>
+            <tr><td><code>twitch-stream</code></td><td>Twitch live player</td></tr>
+            <tr><td><code>tiktok-video</code></td><td>TikTok video embed</td></tr>
+            <tr><td><code>spotify-track</code></td><td>Spotify track player</td></tr>
+            <tr><td><code>spotify-playlist</code></td><td>Spotify playlist player</td></tr>
+            <tr><td><code>spotify-album</code></td><td>Spotify album (taller embed)</td></tr>
+            <tr><td><code>soundcloud-track</code></td><td>SoundCloud player</td></tr>
+            <tr><td><code>apple-music</code></td><td>Apple Music embed</td></tr>
+            <tr><td><code>pdf-viewer</code></td><td>Inline PDF viewer with fallback link</td></tr>
+            <tr><td><code>google-slides</code></td><td>Google Slides presentation</td></tr>
+            <tr><td><code>video-embed</code></td><td>HTML5 video (self-hosted)</td></tr>
+            <tr><td><code>image-gallery</code></td><td>Photo grid with lightbox + swipe</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>newsletter-inline</h3>
+      <pre><code>{
+  <span class="kv">type</span>: <span class="str">"newsletter-inline"</span>,
+  <span class="kv">label</span>: <span class="str">"Join my newsletter"</span>,
+  <span class="kv">description</span>: <span class="str">"Weekly tips — every Tuesday."</span>,
+  <span class="kv">placeholder</span>: <span class="str">"your@email.com"</span>,
+  <span class="kv">buttonLabel</span>: <span class="str">"Subscribe"</span>,
+  <span class="kv">actionUrl</span>: <span class="str">"https://yourname.beehiiv.com/subscribe"</span>, <span class="cm">// Beehiiv, Substack, Mailchimp…</span>
+  <span class="kv">enabled</span>: <span class="bool">true</span>,
+}</code></pre>
+
+      <h3>social-proof</h3>
+      <pre><code><span class="cm">// Stats grid</span>
+{ <span class="kv">type</span>: <span class="str">"social-proof"</span>, <span class="kv">proofType</span>: <span class="str">"stats"</span>,
+  <span class="kv">stats</span>: [{ label: <span class="str">"Followers"</span>, value: <span class="str">"48K+"</span> }, ...] }
+
+<span class="cm">// Testimonial / quote</span>
+{ <span class="kv">type</span>: <span class="str">"social-proof"</span>, <span class="kv">proofType</span>: <span class="str">"testimonial"</span>,
+  <span class="kv">quote</span>: <span class="str">"Amazing work!"</span>, <span class="kv">author</span>: <span class="str">"John"</span>, <span class="kv">authorTitle</span>: <span class="str">"CEO"</span>,
+  <span class="kv">authorAvatar</span>: <span class="str">"https://..."</span> }
+
+<span class="cm">// Client logo wall</span>
+{ <span class="kv">type</span>: <span class="str">"social-proof"</span>, <span class="kv">proofType</span>: <span class="str">"client-logos"</span>,
+  <span class="kv">logos</span>: [{ name: <span class="str">"GitHub"</span>, icon: <span class="str">"simple-icons:github"</span>, color: <span class="str">"#24292e"</span> }] }
+
+<span class="cm">// Certification badges</span>
+{ <span class="kv">type</span>: <span class="str">"social-proof"</span>, <span class="kv">proofType</span>: <span class="str">"badges"</span>,
+  <span class="kv">badges</span>: [{ name: <span class="str">"Google UX"</span>, icon: <span class="str">"simple-icons:google"</span>, color: <span class="str">"#4285F4"</span>, url: <span class="str">"#"</span> }] }
+
+<span class="cm">// Awards</span>
+{ <span class="kv">type</span>: <span class="str">"social-proof"</span>, <span class="kv">proofType</span>: <span class="str">"awards"</span>,
+  <span class="kv">awards</span>: [{ name: <span class="str">"Awwwards SOTD"</span>, org: <span class="str">"Awwwards"</span>, year: <span class="str">"2024"</span> }] }</code></pre>
+
+      <h3>timeline</h3>
+      <pre><code>{
+  <span class="kv">type</span>: <span class="str">"timeline"</span>,
+  <span class="kv">label</span>: <span class="str">"Experience"</span>,
+  <span class="kv">items</span>: [
+    {
+      <span class="kv">date</span>: <span class="str">"2022 — Present"</span>,
+      <span class="kv">title</span>: <span class="str">"Senior Designer at Acme"</span>,
+      <span class="kv">description</span>: <span class="str">"Led the design system team."</span>,
+      <span class="kv">icon</span>: <span class="str">"lucide:briefcase"</span>,
+    },
+  ],
+  <span class="kv">enabled</span>: <span class="bool">true</span>,
+}</code></pre>
+
+      <h3>price</h3>
+      <pre><code>{
+  <span class="kv">type</span>: <span class="str">"price"</span>,
+  <span class="kv">label</span>: <span class="str">"Strategy Session"</span>,
+  <span class="kv">price</span>: <span class="str">"$150"</span>,
+  <span class="kv">period</span>: <span class="str">"session"</span>,
+  <span class="kv">description</span>: <span class="str">"60-min deep dive into your project."</span>,
+  <span class="kv">features</span>: [<span class="str">"1:1 Video Call"</span>, <span class="str">"Action plan"</span>, <span class="str">"Recording"</span>],
+  <span class="kv">buttonLabel</span>: <span class="str">"Book Now"</span>,
+  <span class="kv">url</span>: <span class="str">"https://calendly.com/you"</span>,
+  <span class="kv">width</span>: <span class="str">"half"</span>,    <span class="cm">// "full" | "half" — two halves sit side by side</span>
+  <span class="kv">enabled</span>: <span class="bool">true</span>,
+}</code></pre>
+
+      <h3>utility</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>utilityType</th><th>Required fields</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>clock</code></td><td><code>timezone</code></td><td>Live clock showing the user's current local time</td></tr>
+            <tr><td><code>map</code></td><td><code>address</code>, <code>mapUrl</code></td><td>Location card with a Google Maps link</td></tr>
+            <tr><td><code>qr-code</code></td><td><code>qrData</code></td><td>Auto-generated QR code for any URL</td></tr>
+            <tr><td><code>coupon</code></td><td><code>code</code></td><td>Coupon code with one-click copy</td></tr>
+            <tr><td><code>vcard</code></td><td>—</td><td>Download contact as .vcf file</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <pre><code>{ <span class="kv">type</span>: <span class="str">"utility"</span>, <span class="kv">utilityType</span>: <span class="str">"clock"</span>,  <span class="kv">label</span>: <span class="str">"My local time"</span>, <span class="kv">timezone</span>: <span class="str">"America/Santiago"</span>, <span class="kv">enabled</span>: <span class="bool">true</span> }
+{ <span class="kv">type</span>: <span class="str">"utility"</span>, <span class="kv">utilityType</span>: <span class="str">"coupon"</span>, <span class="kv">label</span>: <span class="str">"Get 20% off"</span>, <span class="kv">code</span>: <span class="str">"WELCOME20"</span>, <span class="kv">enabled</span>: <span class="bool">true</span> }
+{ <span class="kv">type</span>: <span class="str">"utility"</span>, <span class="kv">utilityType</span>: <span class="str">"qr-code"</span>, <span class="kv">qrData</span>: <span class="str">"https://yoursite.com"</span>, <span class="kv">enabled</span>: <span class="bool">true</span> }
+{ <span class="kv">type</span>: <span class="str">"utility"</span>, <span class="kv">utilityType</span>: <span class="str">"vcard"</span>,  <span class="kv">label</span>: <span class="str">"Save my contact"</span>, <span class="kv">enabled</span>: <span class="bool">true</span> }</code></pre>
+    </div>
+
+    <!-- ══ PLATFORMS ═════════════════════════════════════════════ -->
+    <span class="section-anchor" id="platforms"></span>
+    <div class="section">
+      <h2>Platforms (50+)</h2>
+      <p>Use the <code>platform</code> key in any <code>link</code> item. Each platform has a built-in icon, color, and label — all overridable.</p>
+
+      <h3>Social</h3>
+      <div class="platform-grid">
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#E1306C"></span>instagram</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#000000"></span>tiktok</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#000000"></span>x</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#0085ff"></span>bluesky</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#000000"></span>threads</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#6364FF"></span>mastodon</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#1877F2"></span>facebook</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#E60023"></span>pinterest</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FFFC00"></span>snapchat</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF4500"></span>reddit</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#36465D"></span>tumblr</span>
+      </div>
+
+      <h3>Messaging</h3>
+      <div class="platform-grid">
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#25D366"></span>whatsapp</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#2AABEE"></span>telegram</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#3A76F0"></span>signal</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#5865F2"></span>discord</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#4A154B"></span>slack</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#00B900"></span>line</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#7BB32E"></span>wechat</span>
+      </div>
+
+      <h3>Professional &amp; Code</h3>
+      <div class="platform-grid">
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#0A66C2"></span>linkedin</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#181717"></span>github</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FC6D26"></span>gitlab</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#F26522"></span>stackoverflow</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#EA4C89"></span>dribbble</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#1ABCFE"></span>figma</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#F06529"></span>behance</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#141414"></span>readcv</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#DA552F"></span>producthunt</span>
+      </div>
+
+      <h3>Content &amp; Media</h3>
+      <div class="platform-grid">
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF0000"></span>youtube</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#9146FF"></span>twitch</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#1AB7EA"></span>vimeo</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#1DB954"></span>spotify</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF5500"></span>soundcloud</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#1DA0C3"></span>bandcamp</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF3A00"></span>substack</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#000000"></span>medium</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#0A0A0A"></span>devto</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#2962FF"></span>hashnode</span>
+      </div>
+
+      <h3>Monetization &amp; Stores</h3>
+      <div class="platform-grid">
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF5E5B"></span>kofi</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF813F"></span>buymeacoffee</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF424D"></span>patreon</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#003087"></span>paypal</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#009EE3"></span>mercadopago</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#635BFF"></span>stripe</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF90E8"></span>gumroad</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#F7622A"></span>etsy</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#95BF47"></span>shopify</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#EFD847"></span>lemonsqueezy</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF9900"></span>amazon</span>
+      </div>
+
+      <h3>Booking &amp; Events</h3>
+      <div class="platform-grid">
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#006BFF"></span>calendly</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#292929"></span>cal</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#4353FF"></span>tidycal</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#0071BC"></span>eventbrite</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF6640"></span>luma</span>
+      </div>
+
+      <h3>Local Business</h3>
+      <div class="platform-grid">
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#25D366"></span>order-whatsapp</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#6366F1"></span>reservation</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#F59E0B"></span>menu-link</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#FF441F"></span>delivery-rappi</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#EA1D2C"></span>delivery-ifood</span>
+      </div>
+
+      <h3>Other</h3>
+      <div class="platform-grid">
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#0D96F6"></span>app-store</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#01875F"></span>play-store</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#8B5CF6"></span>ticketing</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#4F46E5"></span>book</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#6c47ff"></span>email</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#6c47ff"></span>website</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#F26522"></span>rss</span>
+        <span class="platform-pill"><span class="platform-pill__dot" style="background:#6c47ff"></span>custom</span>
+      </div>
+
+      <div class="callout callout--tip">
+        <div class="callout__icon"><i class="ph-fill ph-lightbulb"></i></div>
+        <div class="callout__body"><strong>Custom platform:</strong> Use <code>platform: "custom"</code> with <code>icon: "lucide:star"</code> and <code>color: "#hex"</code> for any platform not in the list. Lucide icons: <a href="https://lucide.dev/icons/" target="_blank">lucide.dev/icons</a> — Simple Icons: <a href="https://simpleicons.org" target="_blank">simpleicons.org</a></div>
+      </div>
+    </div>
+
+    <!-- ══ IMAGE GALLERY ═════════════════════════════════════════ -->
+    <span class="section-anchor" id="gallery"></span>
+    <div class="section">
+      <h2>Image Gallery</h2>
+      <p>The gallery renders a responsive grid. Clicking any image opens a full-screen lightbox with navigation and touch swipe support.</p>
+
+      <pre><code>{
+  <span class="kv">type</span>: <span class="str">"rich-media"</span>,
+  <span class="kv">mediaType</span>: <span class="str">"image-gallery"</span>,
+  <span class="kv">label</span>: <span class="str">"Portfolio"</span>,
+  <span class="kv">images</span>: [
+    { <span class="kv">src</span>: <span class="str">"https://..."</span>, <span class="kv">alt</span>: <span class="str">"Project 1"</span> },
+    { <span class="kv">src</span>: <span class="str">"https://..."</span>, <span class="kv">alt</span>: <span class="str">"Project 2"</span> },
+    <span class="cm">// up to any number of images</span>
+  ],
+  <span class="kv">description</span>: <span class="str">"Selected work — 2022–2024"</span>,
+  <span class="kv">enabled</span>: <span class="bool">true</span>,
+}</code></pre>
+
+      <p>Lightbox features: keyboard navigation (← → Esc), touch/pointer drag to swipe, image counter, smooth entrance animation. No external dependencies.</p>
+    </div>
+
+    <!-- ══ DEPLOY ══════════════════════════════════════════════ -->
+    <span class="section-anchor" id="deploy"></span>
+    <div class="section">
+      <h2>Deploy to Cloudflare Pages</h2>
+      <p>The recommended platform — free tier, global CDN, security headers pre-configured.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step__num">1</div>
+          <div class="step__line"></div>
+          <div class="step__body">
+            <div class="step__title">Push your repo to GitHub</div>
+            <pre><code>git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/you/mysite.git
+git push -u origin main</code></pre>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">2</div>
+          <div class="step__line"></div>
+          <div class="step__body">
+            <div class="step__title">Create a Cloudflare Pages project</div>
+            <div class="step__desc">Go to <a href="https://dash.cloudflare.com" target="_blank">dash.cloudflare.com</a> → <strong>Pages</strong> → <strong>Create project</strong> → <strong>Connect to Git</strong> → Select your repo.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">3</div>
+          <div class="step__line"></div>
+          <div class="step__body">
+            <div class="step__title">Set build settings</div>
+            <div class="table-wrap">
+              <table>
+                <tr><td><strong>Build command</strong></td><td><code>pnpm build</code></td></tr>
+                <tr><td><strong>Output directory</strong></td><td><code>dist</code></td></tr>
+                <tr><td><strong>Node.js version</strong></td><td><code>20</code></td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">4</div>
+          <div class="step__line"></div>
+          <div class="step__body">
+            <div class="step__title">Click Deploy</div>
+            <div class="step__desc">Your site is live on a <code>*.pages.dev</code> subdomain. Add a custom domain in the Pages settings at any time.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step__num">5</div>
+          <div class="step__body">
+            <div class="step__title">(Optional) Add Cloudflare Web Analytics</div>
+            <div class="step__desc">In the Cloudflare dashboard → Analytics & Logs → Web Analytics → Add site → Copy the beacon token → Paste into <code>analytics.cloudflareBeacon</code> in site-config.ts.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout--tip">
+        <div class="callout__icon"><i class="ph-fill ph-lock-key"></i></div>
+        <div class="callout__body"><strong>Security headers</strong> (CSP, HSTS, X-Frame-Options, etc.) are pre-configured in <code>wrangler.toml</code>. They're applied automatically on Cloudflare Pages.</div>
+      </div>
+    </div>
+
+    <!-- ══ FAQ ═══════════════════════════════════════════════════ -->
+    <span class="section-anchor" id="faq"></span>
+    <div class="section">
+      <h2>FAQ</h2>
+
+      <h3>How do I change my profile photo?</h3>
+      <p>Update the <code>identity.avatar</code> URL in <code>site-config.ts</code>. You can use any public image URL, or add a file to <code>public/</code> and reference it as <code>"/my-photo.jpg"</code>.</p>
+
+      <h3>How do I hide a link without deleting it?</h3>
+      <p>Set <code>enabled: false</code> on any item. It will be invisible on the page but preserved in the code for later.</p>
+
+      <h3>Can I add my own platform icon?</h3>
+      <p>Yes — use <code>platform: "custom"</code> with <code>icon: "lucide:star"</code> (any Lucide or Simple Icons name) and <code>color: "#your-hex"</code>.</p>
+
+      <h3>How do I turn off the "Powered by Zutrabio" footer?</h3>
+      <p>Set <code>features.showPoweredBy: false</code> in <code>site-config.ts</code>.</p>
+
+      <h3>Can visitors change the theme?</h3>
+      <p>Yes, via the floating theme switcher (palette icon). To prevent this, set <code>theme.showThemeSwitcher: false</code>.</p>
+
+      <h3>Why does the promo banner not show after I dismissed it?</h3>
+      <p>The dismiss state is stored in <code>localStorage</code> under the key <code>zutrabio-promo-dismissed</code>. Clear it in DevTools → Application → Local Storage to show the banner again during development.</p>
+
+      <h3>How do I add a second language?</h3>
+      <p>Add entries to <code>seo.alternateLanguages</code> in site-config.ts, e.g. <code>[{ lang: "es", url: "https://es.yoursite.com" }]</code>. This generates <code>hreflang</code> meta tags.</p>
+
+      <hr />
+
+      <div style="text-align: center; margin-top: 2rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
+        <p style="color: var(--text-3); font-size: 0.875rem;">More from Zutra</p>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center;">
+          <a href="https://zutra.gumroad.com/l/zutrabio" target="_blank" class="btn btn--primary">Get Zutrabio on Gumroad ↗</a>
+          <a href="https://zutra.agency/recursos"          target="_blank" class="btn btn--ghost">Free Resources</a>
+          <a href="https://astro.build/themes/author/2995"  target="_blank" class="btn btn--ghost">More Astro Themes</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // ── Theme toggle ───────────────────────────────────────────
+  const root = document.documentElement;
+  const toggles = [document.getElementById("theme-toggle"), document.getElementById("theme-toggle-mobile")];
+
+  function applyTheme(t) {
+    root.setAttribute("data-theme", t);
+    localStorage.setItem("docs-theme", t);
+  }
+
+  const saved = localStorage.getItem("docs-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  applyTheme(saved);
+
+  toggles.forEach(btn => {
+    btn?.addEventListener("click", () => {
+      applyTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    });
+  });
+
+  // ── Mobile sidebar ─────────────────────────────────────────
+  const sidebar  = document.getElementById("sidebar");
+  const overlay  = document.getElementById("overlay");
+  const menuBtn  = document.getElementById("menu-btn");
+
+  menuBtn?.addEventListener("click", () => {
+    sidebar?.classList.toggle("open");
+    overlay?.classList.toggle("open");
+  });
+
+  overlay?.addEventListener("click", () => {
+    sidebar?.classList.remove("open");
+    overlay?.classList.remove("open");
+  });
+
+  // ── Active nav link on scroll ──────────────────────────────
+  const sections = document.querySelectorAll(".section-anchor");
+  const navLinks = document.querySelectorAll(".nav-link");
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          link.classList.toggle("active", link.getAttribute("href") === "#" + id);
+        });
+      }
+    });
+  }, { rootMargin: "-30% 0px -65% 0px" });
+
+  sections.forEach(s => obs.observe(s));
+
+  // ── Close sidebar on nav link click (mobile) ───────────────
+  navLinks.forEach(link => {
+    link.addEventListener("click", () => {
+      sidebar?.classList.remove("open");
+      overlay?.classList.remove("open");
+    });
+  });
+</script>
+</body>
+</html>

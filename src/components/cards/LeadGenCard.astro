@@ -1,0 +1,27 @@
+---
+import type { LeadGenItem } from "@/types/config";
+export interface Props { item: LeadGenItem }
+const { item } = Astro.props;
+---
+<div class="lead-gen">
+  {item.label && <h2 class="lead-gen__label">{item.label}</h2>}
+  {item.description && <p class="lead-gen__desc">{item.description}</p>}
+
+  {item.leadType === "newsletter" || item.leadType === "waitlist" ? (
+    <iframe
+      src={item.formUrl}
+      loading="lazy"
+      class="lead-gen__iframe"
+      title={item.label || "Subscribe"}
+    />
+  ) : (
+    <a
+      href={item.formUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="lead-gen__btn"
+    >
+      {item.buttonLabel || "Subscribe →"}
+    </a>
+  )}
+</div>

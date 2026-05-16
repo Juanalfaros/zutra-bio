@@ -1,0 +1,134 @@
+---
+import type { UtilityItem } from "@/types/config";
+import { Icon } from "astro-icon/components";
+import { siteConfig } from "@/site-config";
+export interface Props { item: UtilityItem }
+const { item } = Astro.props;
+const { siteUrl } = siteConfig;
+
+const qrUrl = item.utilityType === "qr-code"
+  ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(item.qrData || siteUrl)}`
+  : null;
+---
+
+{item.utilityType === "coupon" && (
+  <div class="utility utility--coupon">
+    {item.label && <p class="utility__label">{item.label}</p>}
+    {item.description && <p class="utility__desc">{item.description}</p>}
+    <div class="utility__coupon-code">
+      <code id="coupon-code">{item.code}</code>
+      <button
+        class="utility__copy-btn"
+        data-copy={item.code}
+        aria-label={`Copy coupon code ${item.code}`}
+      >
+        Copy
+      </button>
+    </div>
+  </div>
+)}
+
+{item.utilityType === "map" && (
+  <a
+    href={item.mapUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="utility--map link-card"
+    aria-label={`View ${item.address} on map`}
+  >
+    <span class="link-card__icon" style="--icon-bg: rgba(234,67,53,0.12); --icon-bg-hover: rgba(234,67,53,0.2); --icon-color: #EA4335">
+      <Icon name="lucide:map-pin" width="18" height="18" />
+    </span>
+    <span class="link-card__content">
+      <span class="link-card__label">{item.label || "View on Map"}</span>
+      {item.address && <span class="link-card__desc">{item.address}</span>}
+    </span>
+    <span class="link-card__external" aria-hidden="true">
+      <Icon name="lucide:arrow-up-right" width="15" height="15" />
+    </span>
+  </a>
+)}
+
+{item.utilityType === "vcard" && (
+  <a
+    href="/contact.vcf"
+    download
+    class="utility--vcard link-card"
+    aria-label="Save contact to phone"
+  >
+    <span class="link-card__icon" style="--icon-bg: rgba(79,70,229,0.12); --icon-bg-hover: rgba(79,70,229,0.2); --icon-color: #4F46E5">
+      <Icon name="lucide:contact" width="18" height="18" />
+    </span>
+    <span class="link-card__content">
+      <span class="link-card__label">{item.label || "Save Contact"}</span>
+      {item.description && <span class="link-card__desc">{item.description}</span>}
+    </span>
+    <span class="link-card__external" aria-hidden="true">
+      <Icon name="lucide:download" width="15" height="15" />
+    </span>
+  </a>
+)}
+
+{item.utilityType === "clock" && (
+  <div
+    class="utility utility--clock"
+    data-tz={item.timezone}
+    aria-label={`Local time in ${item.timezone}`}
+  >
+    <span class="utility__clock-left">
+      <Icon name="lucide:clock-3" width="20" height="20" class="utility__clock-icon" aria-hidden="true" />
+      {item.label && <span class="utility__clock-label">{item.label}</span>}
+    </span>
+    <time class="utility__clock-time" id={`clock-${(item.timezone ?? "utc").replace(/\//g, "-")}`}>
+      --:--
+    </time>
+  </div>
+)}
+
+{item.utilityType === "qr-code" && qrUrl && (
+  <div class="utility utility--qr">
+    {item.label && <p class="utility__label">{item.label}</p>}
+    {item.description && <p class="utility__desc">{item.description}</p>}
+    <div class="utility__qr-wrapper">
+      <img
+        src={qrUrl}
+        alt={`QR code for ${item.qrData || siteUrl}`}
+        width="160"
+        height="160"
+        loading="lazy"
+        decoding="async"
+        class="utility__qr-img"
+      />
+    </div>
+    {item.qrData && (
+      <p class="utility__qr-url">{item.qrData}</p>
+    )}
+  </div>
+)}
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>(".utility__copy-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const code = btn.dataset.copy;
+      if (!code) return;
+      try {
+        await navigator.clipboard.writeText(code);
+        const orig = btn.textContent;
+        btn.textContent = "Copied!";
+        setTimeout(() => (btn.textContent = orig), 2000);
+      } catch {}
+    });
+  });
+
+  document.querySelectorAll<HTMLElement>(".utility--clock").forEach((el) => {
+    const tz = el.dataset.tz;
+    const timeEl = el.querySelector("time");
+    if (!tz || !timeEl) return;
+    const fmt = new Intl.DateTimeFormat("en", {
+      hour: "2-digit", minute: "2-digit", timeZone: tz, hour12: false,
+    });
+    const tick = () => { timeEl.textContent = fmt.format(new Date()); };
+    tick();
+    setInterval(tick, 30_000);
+  });
+</script>

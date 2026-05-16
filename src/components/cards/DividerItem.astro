@@ -1,0 +1,13 @@
+---
+import type { Divider } from "@/types/config";
+export interface Props { item: Divider }
+const { item } = Astro.props;
+const style = item.style || "line";
+---
+{style === "line" && <hr class="divider divider--line" aria-hidden="true" />}
+{style === "space" && <div class="divider divider--space" aria-hidden="true" />}
+{style === "dots" && (
+  <div class="divider divider--dots" aria-hidden="true">
+    <span>·</span><span>·</span><span>·</span>
+  </div>
+)}

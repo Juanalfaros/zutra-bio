@@ -1,0 +1,390 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import FloatingThemeSwitcher from "@/components/themes/FloatingThemeSwitcher.astro";
+
+const releases = [
+  {
+    version: "1.1.1",
+    date: "2026-05-16",
+    tag: "latest",
+    sections: [
+      {
+        type: "fixed",
+        items: [
+          "Deprecated scrolling=\"no\" attribute removed from iframe in LeadGenCard.astro.",
+          "Missing is:inline directive added to analytics and schema scripts (Analytics.astro, SchemaOrg.astro) to fix Astro compilation warnings.",
+          "Unused LeadGenItem import removed from freelancer.ts profile.",
+        ],
+      },
+    ],
+  },
+  {
+    version: "1.1.0",
+    date: "2026-05-12",
+    sections: [
+      {
+        type: "added",
+        items: [
+          "Top promotional banner (TopBanner) — dismissible strip configurable from site-config.ts. Persists dismiss state in localStorage.",
+          "Floating theme switcher — replaces the old inline toggle. Bottom-left pill on desktop, top-right icon on mobile. Panel includes light/dark/auto + 3 theme swatches.",
+          "Custom accent colors per theme — new accentColors config object with automatic luminance detection for foreground (black/white).",
+          "Six ready-to-use profiles: freelancer, creator, musician, founder, professional, localbusiness. Swap with one import line.",
+          "Semantic platform entries for local businesses: order-whatsapp, reservation, menu-link, delivery-rappi, delivery-ifood, ticketing, book.",
+          "showThemeSwitcher config flag — set false to lock the design for production.",
+          "theme.colorMode config flag — set default to \"light\", \"dark\", or \"system\".",
+          "Changelog page at /changelog.",
+        ],
+      },
+      {
+        type: "changed",
+        items: [
+          "Theme \"tech\" renamed to \"modern\" — redesigned with glassmorphism, vivid purple accent, gradient background, and Outfit display font.",
+          "site-config.ts fully reorganized — every field has an inline comment. Clearly separated sections for identity, promo, theme, analytics, SEO, schema, geo, features, footer.",
+          "theme.showThemeToggle renamed to theme.showThemeSwitcher.",
+          "theme.accentColor (string) replaced by theme.accentColors (Partial<Record<ThemePreset, string>>) — now configurable per theme.",
+          "Banner is now full-width behind the profile header. Avatar lifts out with a negative margin.",
+          "All hover states wrapped in @media (hover: hover) and (pointer: fine) — no sticky-hover artifacts on touch devices.",
+          "Highlight link cards (highlight: true) retain accent background on hover across all themes, including the glassmorphism modern override.",
+        ],
+      },
+      {
+        type: "fixed",
+        items: [
+          "[data-theme=\"modern\"].dark selectors had no effect — ThemeScript sets data-color-mode attribute, not a .dark class. All dark overrides updated to :where(.dark, [data-color-mode=\"dark\"]).",
+          "Emoji icon detection used icon.length <= 2 which failed with multi-codepoint emoji (🎟️ has length 3). Replaced with icon.includes(\":\") — completely reliable.",
+          "--accent-rgb CSS variable referenced in newsletter focus ring was never defined. Replaced with var(--border-hover).",
+          "Social proof logo/badge images from cdn.simpleicons.org and Clearbit were broken. Replaced with astro-icon <Icon> components.",
+          "Invalid icon names corrected: amazonaws → amazonwebservices, code-2 → code, readcv → readdotcv, mirror → globe, teachable → coursera.",
+          "platform: \"applemusic\" → \"apple-music\" (TypeScript error).",
+          "Clock utility layout broken — restructured with justify-content: space-between and a grouped left wrapper.",
+          "Duplicate @media (max-width: 480px) grid block merged.",
+          "overflow-x: hidden added to html, body to prevent horizontal scroll on mobile.",
+        ],
+      },
+    ],
+  },
+  {
+    version: "1.0.0",
+    date: "2025-12-01",
+    tag: "initial",
+    sections: [
+      {
+        type: "added",
+        items: [
+          "Initial release of Zutrabio.",
+          "Three themes: minimal, tech, neobrutalist.",
+          "Dark / light / system color mode with FOUC-free inline script.",
+          "50+ platform metadata entries in platforms.ts.",
+          "Full SEO stack: Open Graph, Twitter Cards, Schema.org JSON-LD, GEO meta, hreflang, sitemap.",
+          "Five analytics integrations: GTM, Cloudflare, Umami, Plausible, Fathom.",
+          "Content blocks: link, text-block, rich-media, newsletter-inline, social-proof, timeline, price, utility, section-header, divider.",
+          "Utility widgets: clock, map, QR code, coupon, vCard.",
+          "Rich media embeds: YouTube, Vimeo, Spotify, SoundCloud, PDF.",
+          "Cloudflare Pages deployment with pre-configured security headers.",
+          "Static output — zero JavaScript required for core content.",
+        ],
+      },
+    ],
+  },
+];
+
+const tagLabels: Record<string, string> = {
+  latest:  "Latest",
+  initial: "Initial Release",
+};
+
+const typeConfig: Record<string, { label: string; color: string }> = {
+  added:   { label: "Added",   color: "cl-added" },
+  changed: { label: "Changed", color: "cl-changed" },
+  fixed:   { label: "Fixed",   color: "cl-fixed" },
+};
+---
+
+<BaseLayout
+  title="Changelog — Zutrabio"
+  description="Release history and version notes for the Zutrabio link-in-bio Astro theme."
+>
+  <div class="cl-page">
+    <header class="cl-header">
+      <a href="/" class="cl-back">← Back</a>
+      <h1 class="cl-title">Changelog</h1>
+      <p class="cl-subtitle">Release history for Zutrabio — the link-in-bio Astro theme.</p>
+    </header>
+
+    <main class="cl-main">
+      {releases.map((release) => (
+        <article class="cl-release">
+          <!-- Release header -->
+          <div class="cl-release__head">
+            <div class="cl-release__meta">
+              <h2 class="cl-release__version">v{release.version}</h2>
+              {release.tag && (
+                <span class={`cl-release__tag cl-release__tag--${release.tag}`}>
+                  {tagLabels[release.tag]}
+                </span>
+              )}
+            </div>
+            <time class="cl-release__date" datetime={release.date}>
+              {new Date(release.date).toLocaleDateString("en-US", {
+                year: "numeric", month: "long", day: "numeric"
+              })}
+            </time>
+          </div>
+
+          <!-- Sections -->
+          <div class="cl-sections">
+            {release.sections.map((section) => {
+              const cfg = typeConfig[section.type];
+              return (
+                <div class="cl-section">
+                  <span class={`cl-section__badge ${cfg.color}`}>{cfg.label}</span>
+                  <ul class="cl-list">
+                    {section.items.map((item) => (
+                      <li class="cl-item">{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </article>
+      ))}
+    </main>
+
+    <footer class="cl-footer">
+      <p class="cl-footer__label">More from Zutra</p>
+      <div class="cl-footer__links">
+        <a href="https://zutra.gumroad.com/l/zutrabio" target="_blank" rel="noopener noreferrer" class="cl-footer__cta">
+          Get Zutrabio on Gumroad ↗
+        </a>
+        <a href="https://zutra.agency/recursos" target="_blank" rel="noopener noreferrer" class="cl-footer__secondary">
+          Free Resources
+        </a>
+        <a href="https://astro.build/themes/author/2995" target="_blank" rel="noopener noreferrer" class="cl-footer__secondary">
+          More Astro Themes
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <FloatingThemeSwitcher />
+</BaseLayout>
+
+<style>
+  .cl-page {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body, sans-serif);
+  }
+
+  /* ── Header ── */
+  .cl-header {
+    max-width: 680px;
+    margin-inline: auto;
+    padding: 3rem 1.25rem 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cl-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: 1.25rem;
+    transition: color 0.15s;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cl-back:hover { color: var(--text); }
+  }
+
+  .cl-title {
+    font-family: var(--font-display, serif);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .cl-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  /* ── Main ── */
+  .cl-main {
+    max-width: 680px;
+    margin-inline: auto;
+    padding: 0 1.25rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ── Release block ── */
+  .cl-release {
+    padding: 2.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cl-release:last-child {
+    border-bottom: none;
+  }
+
+  .cl-release__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .cl-release__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .cl-release__version {
+    font-family: var(--font-display, serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .cl-release__tag {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    line-height: 1;
+  }
+
+  .cl-release__tag--latest  { background: var(--accent); color: var(--accent-fg); }
+  .cl-release__tag--initial { background: var(--border);  color: var(--text-muted); }
+
+  .cl-release__date {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Sections ── */
+  .cl-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .cl-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cl-section__badge {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 0.375rem;
+    width: fit-content;
+  }
+
+  .cl-added   { background: rgba(34, 197, 94, 0.15);  color: #16a34a; }
+  .cl-changed { background: rgba(99, 102, 241, 0.12); color: #4f46e5; }
+  .cl-fixed   { background: rgba(251, 146, 60, 0.15); color: #ea580c; }
+
+  :where(.dark, [data-color-mode="dark"]) .cl-added   { background: rgba(34,197,94,0.12);   color: #4ade80; }
+  :where(.dark, [data-color-mode="dark"]) .cl-changed { background: rgba(99,102,241,0.15);  color: #818cf8; }
+  :where(.dark, [data-color-mode="dark"]) .cl-fixed   { background: rgba(251,146,60,0.12);  color: #fb923c; }
+
+  /* ── List ── */
+  .cl-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    padding-left: 0.125rem;
+  }
+
+  .cl-item {
+    position: relative;
+    padding-left: 1.25rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .cl-item::before {
+    content: "–";
+    position: absolute;
+    left: 0;
+    color: var(--border-hover);
+    font-weight: 700;
+  }
+
+  /* ── Footer ── */
+  .cl-footer {
+    max-width: 680px;
+    margin-inline: auto;
+    padding: 2rem 1.25rem 4rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .cl-footer__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+
+  .cl-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem 1.25rem;
+  }
+
+  .cl-footer__cta {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1.5px solid currentColor;
+    padding-bottom: 2px;
+    transition: opacity 0.15s;
+  }
+
+  .cl-footer__secondary {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cl-footer__cta:hover { opacity: 0.75; }
+    .cl-footer__secondary:hover { color: var(--text); border-color: var(--border-hover); }
+  }
+</style>

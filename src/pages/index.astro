@@ -1,0 +1,40 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import ProfileHeader from "@/components/ui/ProfileHeader.astro";
+import PageRenderer from "@/components/ui/PageRenderer.astro";
+import FloatingThemeSwitcher from "@/components/themes/FloatingThemeSwitcher.astro";
+import Footer from "@/components/ui/Footer.astro";
+import { siteConfig, pageItems } from "@/site-config";
+
+const { identity } = siteConfig;
+---
+
+<BaseLayout>
+  <div class="page-wrapper">
+
+    <!-- Banner full-width -->
+    {identity.banner && (
+      <div class="page-banner" aria-hidden="true">
+        <img
+          src={identity.banner}
+          alt=""
+          class="page-banner__img"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
+        <div class="page-banner__overlay" />
+      </div>
+    )}
+
+    <main class="page-main" id="main-content">
+      <ProfileHeader />
+      <PageRenderer items={pageItems} />
+    </main>
+
+    <Footer />
+  </div>
+
+  <!-- Floating theme/color-mode switcher (bottom-left) -->
+  <FloatingThemeSwitcher />
+</BaseLayout>

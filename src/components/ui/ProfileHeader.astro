@@ -1,0 +1,86 @@
+---
+import { siteConfig } from "@/site-config";
+import { Icon } from "astro-icon/components";
+
+const { identity, features, siteUrl } = siteConfig;
+---
+
+<section class={`profile-header ${identity.banner ? "profile-header--has-banner" : ""}`} aria-label="Profile">
+
+  <!-- Avatar -->
+  <div class={`avatar-wrapper ${features.avatarRing ? "avatar-ring" : ""} ${identity.banner ? "avatar-wrapper--lifted" : ""}`}>
+    <img
+      src={identity.avatar}
+      alt={identity.avatarAlt}
+      class="avatar-img"
+      width="96"
+      height="96"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+    />
+  </div>
+
+  <!-- Name -->
+  <h1 class="profile-name">{identity.name}</h1>
+
+  <!-- Handle + Pronouns -->
+  <div class="profile-sub">
+    {identity.handle && <span class="profile-handle">{identity.handle}</span>}
+    {identity.pronouns && <span class="profile-pronouns">· {identity.pronouns}</span>}
+  </div>
+
+  <!-- Bio -->
+  <p class="profile-bio">{identity.bio}</p>
+
+  <!-- Extended Bio -->
+  {identity.bioExtended && (
+    <div class="profile-bio-extended" set:html={identity.bioExtended} />
+  )}
+
+  <!-- Location + Timezone -->
+  <div class="profile-meta">
+    {identity.location && (
+      <span class="profile-location">
+        <Icon name="lucide:map-pin" width="13" height="13" aria-hidden="true" />
+        {identity.location}
+      </span>
+    )}
+    {identity.timezone && (
+      <span class="profile-timezone" id="local-time" data-tz={identity.timezone}>
+        <Icon name="lucide:clock" width="13" height="13" aria-hidden="true" />
+        <time id="tz-time"></time>
+      </span>
+    )}
+  </div>
+
+  <!-- Copy link -->
+  {features.showCopyLink && (
+    <button class="copy-link-btn" id="copy-link" data-url={siteUrl} aria-label="Copy link to this page">
+      <Icon name="lucide:link" width="14" height="14" aria-hidden="true" />
+      <span class="copy-label">Copy Link</span>
+    </button>
+  )}
+</section>
+
+<script>
+  const tzEl = document.querySelector<HTMLElement>("#local-time");
+  const timeEl = document.getElementById("tz-time");
+  if (tzEl && timeEl) {
+    const tz = tzEl.getAttribute("data-tz") || "UTC";
+    const fmt = new Intl.DateTimeFormat("en", { hour: "2-digit", minute: "2-digit", timeZone: tz, hour12: false });
+    const tick = () => { timeEl.textContent = fmt.format(new Date()); timeEl.setAttribute("datetime", new Date().toISOString()); };
+    tick();
+    setInterval(tick, 30_000);
+  }
+
+  document.getElementById("copy-link")?.addEventListener("click", async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const url = btn.dataset.url || location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      const label = btn.querySelector(".copy-label");
+      if (label) { const orig = label.textContent; label.textContent = "Copied!"; setTimeout(() => (label.textContent = orig), 2000); }
+    } catch {}
+  });
+</script>

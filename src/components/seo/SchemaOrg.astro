@@ -1,0 +1,121 @@
+---
+/**
+ * SchemaOrg.astro
+ * Generates JSON-LD structured data for Person or Organization.
+ * Outputs ProfilePage + Person/Organization schemas.
+ */
+import { siteConfig, pageItems } from "@/site-config";
+
+const { identity, schema, siteUrl } = siteConfig;
+if (!schema.enabled) return;
+
+const isOrg = identity.type === "organization";
+
+// Collect all social URLs from enabled link items
+const socialUrls = pageItems
+  .filter((item): item is import("@/types/config").LinkItem =>
+    item.type === "link" && "url" in item && item.enabled === true
+  )
+  .filter((item) =>
+    ["instagram","x","twitter","facebook","linkedin","github","youtube",
+     "tiktok","bluesky","mastodon","threads","pinterest","soundcloud",
+     "spotify","medium","devto"].includes(item.platform)
+  )
+  .map((item) => item.url);
+
+// Merge sameAs from config + detected social URLs (deduplicated)
+const configSameAs = isOrg
+  ? schema.organization.sameAs
+  : schema.person.sameAs;
+const allSameAs = [...new Set([...configSameAs, ...socialUrls])];
+
+// ── Person schema ──────────────────────────────────────────────
+const personSchema = !isOrg
+  ? {
+      "@type": "Person",
+      "@id": `${siteUrl}/#person`,
+      name: schema.person.name || identity.name,
+      url: siteUrl,
+      image: {
+        "@type": "ImageObject",
+        url: identity.avatar.startsWith("http")
+          ? identity.avatar
+          : `${siteUrl}${identity.avatar}`,
+        caption: identity.avatarAlt,
+      },
+      description: siteConfig.seo.description,
+      ...(schema.person.jobTitle && { jobTitle: schema.person.jobTitle }),
+      ...(schema.person.worksFor && {
+        worksFor: { "@type": "Organization", url: schema.person.worksFor },
+      }),
+      ...(schema.person.knowsAbout.length > 0 && {
+        knowsAbout: schema.person.knowsAbout,
+      }),
+      ...(schema.person.alumniOf && {
+        alumniOf: { "@type": "Organization", name: schema.person.alumniOf },
+      }),
+      ...(identity.location && { address: identity.location }),
+      ...(allSameAs.length > 0 && { sameAs: allSameAs }),
+    }
+  : null;
+
+// ── Organization schema ────────────────────────────────────────
+const orgSchema = isOrg
+  ? {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: identity.name,
+      url: siteUrl,
+      logo: schema.organization.logo
+        ? {
+            "@type": "ImageObject",
+            url: schema.organization.logo.startsWith("http")
+              ? schema.organization.logo
+              : `${siteUrl}${schema.organization.logo}`,
+          }
+        : undefined,
+      description: siteConfig.seo.description,
+      ...(schema.organization.legalName && {
+        legalName: schema.organization.legalName,
+      }),
+      ...(schema.organization.foundingDate && {
+        foundingDate: schema.organization.foundingDate,
+      }),
+      ...(schema.organization.numberOfEmployees > 0 && {
+        numberOfEmployees: {
+          "@type": "QuantitativeValue",
+          value: schema.organization.numberOfEmployees,
+        },
+      }),
+      ...(allSameAs.length > 0 && { sameAs: allSameAs }),
+    }
+  : null;
+
+// ── ProfilePage schema ─────────────────────────────────────────
+const profilePageSchema = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "@id": `${siteUrl}/#profilepage`,
+  url: siteUrl,
+  name: siteConfig.seo.title,
+  description: siteConfig.seo.description,
+  dateModified: new Date().toISOString().split("T")[0],
+  mainEntity: isOrg ? orgSchema : personSchema,
+};
+
+// ── WebSite schema (for sitelinks searchbox) ──────────────────
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${siteUrl}/#website`,
+  url: siteUrl,
+  name: identity.name,
+  description: siteConfig.seo.description,
+};
+
+const schemas = [profilePageSchema, websiteSchema];
+---
+
+{schemas.map((s) => (
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(s, null, 2)} />
+))}

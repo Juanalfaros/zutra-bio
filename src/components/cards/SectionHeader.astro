@@ -1,0 +1,10 @@
+---
+// SectionHeader.astro
+import type { SectionHeader } from "@/types/config";
+export interface Props { item: SectionHeader }
+const { item } = Astro.props;
+---
+<div class="section-header" role="presentation">
+  {item.icon && <span class="section-header__icon" aria-hidden="true">{item.icon}</span>}
+  <span class="section-header__label">{item.label}</span>
+</div>

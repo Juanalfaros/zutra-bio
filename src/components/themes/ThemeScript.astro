@@ -1,0 +1,60 @@
+---
+import { siteConfig } from "@/site-config";
+const { theme } = siteConfig;
+---
+
+<script
+  is:inline
+  define:vars={{
+    defaultTheme: theme.default,
+    defaultColorMode: theme.colorMode,
+    accentColors: theme.accentColors ?? {},
+  }}
+>
+  (function () {
+    const THEME_KEY = "zutrabio-theme";
+    const COLOR_KEY = "zutrabio-color-mode";
+    const root = document.documentElement;
+
+    // Restore theme preset
+    const savedTheme = localStorage.getItem(THEME_KEY) || defaultTheme;
+    root.setAttribute("data-theme", savedTheme);
+
+    // Apply custom accent color for active theme
+    const accentOverride = accentColors[savedTheme];
+    if (accentOverride) {
+      root.style.setProperty("--accent", accentOverride);
+      // Simple luminance check — if color is bright, fg is dark; else white
+      const hex = accentOverride.replace("#", "");
+      const r = parseInt(hex.slice(0,2), 16);
+      const g = parseInt(hex.slice(2,4), 16);
+      const b = parseInt(hex.slice(4,6), 16);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      root.style.setProperty("--accent-fg", lum > 0.55 ? "#000000" : "#ffffff");
+    }
+
+    // Restore color mode
+    const savedMode = localStorage.getItem(COLOR_KEY) || defaultColorMode;
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = savedMode === "dark" || (savedMode === "system" && prefersDark);
+    root.classList.toggle("dark", isDark);
+    root.setAttribute("data-color-mode", isDark ? "dark" : "light");
+
+    // Re-apply accent on theme switch (called by FloatingThemeSwitcher)
+    window.__zutrabioApplyAccent = function(preset) {
+      const color = accentColors[preset];
+      if (color) {
+        root.style.setProperty("--accent", color);
+        const hex = color.replace("#", "");
+        const r = parseInt(hex.slice(0,2), 16);
+        const g = parseInt(hex.slice(2,4), 16);
+        const b = parseInt(hex.slice(4,6), 16);
+        const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        root.style.setProperty("--accent-fg", lum > 0.55 ? "#000000" : "#ffffff");
+      } else {
+        root.style.removeProperty("--accent");
+        root.style.removeProperty("--accent-fg");
+      }
+    };
+  })();
+</script>

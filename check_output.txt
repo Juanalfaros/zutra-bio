@@ -1,0 +1,63 @@
+
+> zutrabio@1.1.0 check
+> astro check
+
+18:54:24 [types] Generated 20ms
+18:54:24 [check] Getting diagnostics for Astro files in /Users/juanalfaro/Projects/zutrabio...
+[96msrc/components/cards/LeadGenCard.astro[0m:[93m16[0m:[93m7[0m - [93mwarning[0m[90m ts(6385): [0m'scrolling' is deprecated.
+
+[7m16[0m       scrolling="no"
+[7m  [0m [93m      ~~~~~~~~~[0m
+
+[96msrc/components/seo/Analytics.astro[0m:[93m76[0m:[93m9[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m76[0m         src="https://cdn.usefathom.com/script.js"
+[7m  [0m [93m        ~~~[0m
+[96msrc/components/seo/Analytics.astro[0m:[93m67[0m:[93m9[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m67[0m         defer
+[7m  [0m [93m        ~~~~~[0m
+[96msrc/components/seo/Analytics.astro[0m:[93m58[0m:[93m9[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m58[0m         defer
+[7m  [0m [93m        ~~~~~[0m
+[96msrc/components/seo/Analytics.astro[0m:[93m49[0m:[93m9[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m49[0m         defer
+[7m  [0m [93m        ~~~~~[0m
+
+[96msrc/components/seo/SchemaOrg.astro[0m:[93m120[0m:[93m11[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m120[0m   <script type="application/ld+json" set:html={JSON.stringify(s, null, 2)} />
+[7m   [0m [93m          ~~~~[0m
+
+[96msrc/profiles/freelancer.ts[0m:[93m4[0m:[93m18[0m - [93mwarning[0m[90m ts(6196): [0m'LeadGenItem' is declared but never used.
+
+[7m4[0m   RichMediaItem, LeadGenItem, SocialProofItem, UtilityItem,
+[7m [0m [93m                 ~~~~~~~~~~~[0m
+
+Result (38 files): 
+- 0 errors
+- 0 warnings
+- 7 hints
+

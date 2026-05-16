@@ -1,0 +1,113 @@
+---
+import { siteConfig } from "@/site-config";
+const { footer, features, identity } = siteConfig;
+const year = new Date().getFullYear();
+const copyright = footer.copyright || `© ${year} ${identity.name}`;
+---
+
+<footer class="site-footer">
+  <p class="site-footer__copy">{copyright}</p>
+
+  {footer.links.length > 0 && (
+    <nav class="site-footer__links" aria-label="Footer navigation">
+      {footer.links.map((link) => (
+        <a href={link.href} class="site-footer__link">{link.label}</a>
+      ))}
+    </nav>
+  )}
+
+  {features.showLastUpdated && (
+    <p class="site-footer__updated" aria-label="Last updated">
+      Updated {new Date().toLocaleDateString("en", { year: "numeric", month: "long" })}
+    </p>
+  )}
+
+  {features.showPoweredBy && (
+    <p class="site-footer__powered">
+      Made with{" "}
+      <a
+        href="https://zutra.gumroad.com/l/zutrabio"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="site-footer__brand"
+      >
+        Zutrabio
+      </a>
+      {" "}+{" "}
+      <a href="https://astro.build" target="_blank" rel="noopener noreferrer">
+        Astro
+      </a>
+    </p>
+  )}
+
+  {features.showPoweredBy && (
+  <nav class="site-footer__zutra" aria-label="Zutra resources">
+    <a
+      href="https://zutra.agency/recursos"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="site-footer__zutra-link"
+    >
+      Free Resources
+    </a>
+    <span class="site-footer__zutra-sep" aria-hidden="true">·</span>
+    <a
+      href="https://astro.build/themes/author/2995"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="site-footer__zutra-link"
+    >
+      More Astro Themes
+    </a>
+    <span class="site-footer__zutra-sep" aria-hidden="true">·</span>
+    <a
+      href="https://zutra.gumroad.com/l/zutrabio"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="site-footer__zutra-link site-footer__zutra-link--cta"
+    >
+      Get Zutrabio ↗
+    </a>
+  </nav>
+  )}
+</footer>
+
+<style>
+  .site-footer__zutra {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: 0.25rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    width: 100%;
+  }
+
+  .site-footer__zutra-link {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-footer__zutra-link:hover { color: var(--text); }
+  }
+
+  .site-footer__zutra-link--cta {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-footer__zutra-link--cta:hover { opacity: 0.8; color: var(--accent); }
+  }
+
+  .site-footer__zutra-sep {
+    color: var(--border-hover);
+    font-size: 0.75rem;
+    user-select: none;
+  }
+</style>

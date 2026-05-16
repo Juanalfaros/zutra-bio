@@ -1,0 +1,16 @@
+{
+  "name": "My Link in Bio",
+  "short_name": "LinkInBio",
+  "description": "My personal link in bio page.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#6c47ff",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

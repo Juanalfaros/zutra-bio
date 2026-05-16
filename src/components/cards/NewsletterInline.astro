@@ -1,0 +1,129 @@
+---
+import type { NewsletterInlineItem } from "@/types/config";
+import { Icon } from "astro-icon/components";
+
+export interface Props {
+  item: NewsletterInlineItem;
+}
+
+const { item } = Astro.props;
+---
+
+<div class="newsletter-inline">
+  <div class="newsletter-inline__header">
+    <h3 class="newsletter-inline__label">{item.label}</h3>
+    {item.description && <p class="newsletter-inline__desc">{item.description}</p>}
+  </div>
+
+  <form action={item.actionUrl} method="POST" target="_blank" class="newsletter-inline__form">
+    <div class="newsletter-inline__input-wrapper">
+      <Icon name="lucide:mail" width="16" height="16" class="newsletter-inline__icon" />
+      <input
+        type="email"
+        name="email"
+        placeholder={item.placeholder || "Enter your email..."}
+        required
+        class="newsletter-inline__input"
+      />
+    </div>
+    <button type="submit" class="newsletter-inline__btn">
+      {item.buttonLabel || "Subscribe"}
+    </button>
+  </form>
+</div>
+
+<style>
+  .newsletter-inline {
+    background: var(--bg-card);
+    border: var(--card-border-width) var(--card-border-style) var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: var(--shadow);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  @media (min-width: 480px) {
+    .newsletter-inline {
+      padding: 2.25rem 1.75rem;
+    }
+  }
+
+  .newsletter-inline__label {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+  }
+
+  .newsletter-inline__desc {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.375rem;
+    line-height: 1.5;
+  }
+
+  .newsletter-inline__form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 400px) {
+    .newsletter-inline__form {
+      flex-direction: row;
+    }
+  }
+
+  .newsletter-inline__input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .newsletter-inline__icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .newsletter-inline__input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 0.9375rem;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+
+  .newsletter-inline__input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--border-hover);
+  }
+
+  .newsletter-inline__btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--accent);
+    color: var(--accent-fg);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: opacity var(--transition), transform var(--transition);
+    white-space: nowrap;
+  }
+
+  .newsletter-inline__btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+</style>

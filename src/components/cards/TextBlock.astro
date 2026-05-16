@@ -1,0 +1,19 @@
+---
+import type { TextBlock } from "@/types/config";
+export interface Props { item: TextBlock }
+const { item } = Astro.props;
+const styleClass = `text-block text-block--${item.style || "default"}`;
+---
+<div class={styleClass}>
+  {item.style === "announcement" ? (
+    <div class="text-block__announcement-body">
+      {item.label && <h2 class="text-block__label">{item.label}</h2>}
+      <div class="text-block__content" set:html={item.content} />
+    </div>
+  ) : (
+    <>
+      {item.label && <h2 class="text-block__label">{item.label}</h2>}
+      <div class="text-block__content" set:html={item.content} />
+    </>
+  )}
+</div>

@@ -1,0 +1,67 @@
+---
+/**
+ * PageRenderer.astro
+ * Iterates over the pageItems array from site-config.ts and
+ * renders the appropriate component for each item type.
+ */
+import type { PageItem } from "@/types/config";
+import LinkCard from "@/components/cards/LinkCard.astro";
+import SectionHeader from "@/components/cards/SectionHeader.astro";
+import DividerItem from "@/components/cards/DividerItem.astro";
+import TextBlock from "@/components/cards/TextBlock.astro";
+import RichMediaCard from "@/components/cards/RichMediaCard.astro";
+import LeadGenCard from "@/components/cards/LeadGenCard.astro";
+import SocialProofCard from "@/components/cards/SocialProofCard.astro";
+import UtilityCard from "@/components/cards/UtilityCard.astro";
+import PriceCard from "@/components/cards/PriceCard.astro";
+import TimelineCard from "@/components/cards/TimelineCard.astro";
+import NewsletterInline from "@/components/cards/NewsletterInline.astro";
+import { siteConfig } from "@/site-config";
+
+export interface Props {
+  items: PageItem[];
+}
+
+const { items } = Astro.props;
+const { features } = siteConfig;
+
+// Filter to only enabled items (structural items like headers/dividers always show)
+const visibleItems = items.filter((item) => {
+  if (item.type === "section-header" || item.type === "divider") return true;
+  return "enabled" in item ? item.enabled : true;
+});
+
+// Remove orphan section headers (header with no enabled items after it before next header/end)
+const cleanedItems = visibleItems.filter((item, idx) => {
+  if (item.type !== "section-header") return true;
+  const next = visibleItems[idx + 1];
+  if (!next) return false;
+  return next.type !== "section-header" && next.type !== "divider";
+});
+---
+
+<div
+  class="page-items grid-container"
+  role="list"
+  aria-label="Links and content"
+>
+  {cleanedItems.map((item, index) => (
+    <div
+      class={`page-item ${features.animateCards ? "animate-in" : ""} ${"width" in item && item.width === "half" ? "page-item--half" : "page-item--full"}`}
+      style={features.animateCards ? `--delay: ${index * 60}ms` : ""}
+      role={item.type === "link" ? "listitem" : undefined}
+    >
+      {item.type === "link" && <LinkCard item={item} />}
+      {item.type === "section-header" && <SectionHeader item={item} />}
+      {item.type === "divider" && <DividerItem item={item} />}
+      {item.type === "text-block" && <TextBlock item={item} />}
+      {item.type === "rich-media" && <RichMediaCard item={item} />}
+      {item.type === "lead-gen" && <LeadGenCard item={item} />}
+      {item.type === "social-proof" && <SocialProofCard item={item} />}
+      {item.type === "utility" && <UtilityCard item={item} />}
+      {item.type === "price" && <PriceCard item={item} />}
+      {item.type === "timeline" && <TimelineCard item={item} />}
+      {item.type === "newsletter-inline" && <NewsletterInline item={item} />}
+    </div>
+  ))}
+</div>

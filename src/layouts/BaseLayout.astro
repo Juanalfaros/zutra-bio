@@ -1,0 +1,161 @@
+---
+import { siteConfig } from "@/site-config";
+import Analytics from "@/components/seo/Analytics.astro";
+import SchemaOrg from "@/components/seo/SchemaOrg.astro";
+import ThemeScript from "@/components/themes/ThemeScript.astro";
+import TopBanner from "@/components/ui/TopBanner.astro";
+import FloatingAction from "@/components/ui/FloatingAction.astro";
+import ExitIntentPopup from "@/components/ui/ExitIntentPopup.astro";
+import SlideInCard from "@/components/ui/SlideInCard.astro";
+import "@/styles/global.css";
+
+export interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  ogType?: string;
+  robots?: string;
+  canonical?: string;
+}
+
+const {
+  title = siteConfig.seo.title,
+  description = siteConfig.seo.description,
+  ogImage = siteConfig.openGraph.image,
+  ogType = siteConfig.openGraph.type,
+  robots = siteConfig.seo.robots,
+  canonical,
+} = Astro.props;
+
+const resolvedTitle = title === siteConfig.seo.title
+  ? title
+  : siteConfig.seo.titleTemplate.replace("%s", title);
+
+const canonicalUrl = canonical
+  ? canonical
+  : siteConfig.seo.canonical
+    ? siteConfig.seo.canonical
+    : new URL(Astro.url.pathname, siteConfig.siteUrl).toString();
+
+const ogImageAbsolute = ogImage.startsWith("http")
+  ? ogImage
+  : new URL(ogImage, siteConfig.siteUrl).toString();
+
+const { siteUrl, identity, openGraph, twitter, geo, seo } = siteConfig;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth" data-theme={siteConfig.theme.default}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- ── Favicon ── -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#6c47ff" />
+
+    <!-- ── Primary Meta ── -->
+    <title>{resolvedTitle}</title>
+    <meta name="description" content={description} />
+    {seo.keywords.length > 0 && (
+      <meta name="keywords" content={seo.keywords.join(", ")} />
+    )}
+    <meta name="robots" content={robots} />
+    <meta name="author" content={identity.name} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- ── Generator ── -->
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- ── Open Graph ── -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={resolvedTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageAbsolute} />
+    <meta property="og:image:width" content={String(openGraph.imageWidth)} />
+    <meta property="og:image:height" content={String(openGraph.imageHeight)} />
+    <meta property="og:image:alt" content={openGraph.imageAlt} />
+    <meta property="og:locale" content={openGraph.locale} />
+    <meta property="og:site_name" content={identity.name} />
+
+    <!-- ── Twitter / X Card ── -->
+    <meta name="twitter:card" content={twitter.card} />
+    <meta name="twitter:url" content={canonicalUrl} />
+    <meta name="twitter:title" content={resolvedTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageAbsolute} />
+    <meta name="twitter:image:alt" content={openGraph.imageAlt} />
+    {twitter.creator && <meta name="twitter:creator" content={twitter.creator} />}
+    {twitter.site && <meta name="twitter:site" content={twitter.site} />}
+
+    <!-- ── GEO Meta ── -->
+    {geo.enabled && (
+      <>
+        <meta name="geo.region" content={geo.region} />
+        <meta name="geo.placename" content={geo.placename} />
+        <meta name="geo.position" content={`${geo.latitude};${geo.longitude}`} />
+        <meta name="ICBM" content={geo.icbm} />
+      </>
+    )}
+
+    <!-- ── Alternate Languages (hreflang) ── -->
+    {seo.alternateLanguages.map(({ lang, url }) => (
+      <link rel="alternate" hreflang={lang} href={url} />
+    ))}
+    {seo.alternateLanguages.length > 0 && (
+      <link rel="alternate" hreflang="x-default" href={siteUrl} />
+    )}
+
+    <!-- ── Fediverse / Mastodon Verification ── -->
+    {identity.verificationLinks.map((url) => (
+      <link rel="me" href={url} />
+    ))}
+
+    <!-- ── Preconnect + Google Fonts ── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=DM+Serif+Display:ital@0;1&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;600;800&display=swap"
+    />
+
+    <!-- ── RSS Feed ── -->
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${identity.name} RSS Feed`}
+      href="/rss.xml"
+    />
+
+    <!-- ── Schema.org JSON-LD ── -->
+    <SchemaOrg />
+
+    <!-- ── Analytics (GTM head snippet) ── -->
+    <Analytics placement="head" />
+
+    <!-- ── Theme initialization (must be inline to avoid FOUC) ── -->
+    <ThemeScript />
+
+  </head>
+  <body class="min-h-screen antialiased">
+    <!-- GTM noscript fallback -->
+    <Analytics placement="body" />
+
+    <TopBanner />
+    <slot />
+
+    <ExitIntentPopup />
+    <SlideInCard />
+
+    {siteConfig.floatingCta?.enabled && (
+      <FloatingAction
+        label={siteConfig.floatingCta.label}
+        icon={siteConfig.floatingCta.icon}
+        href={siteConfig.floatingCta.href}
+      />
+    )}
+  </body>
+</html>

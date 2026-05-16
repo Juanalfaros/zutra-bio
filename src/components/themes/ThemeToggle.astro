@@ -1,0 +1,104 @@
+---
+import { siteConfig } from "@/site-config";
+import { Icon } from "astro-icon/components";
+
+const { theme } = siteConfig;
+if (!theme.showThemeSwitcher) return;
+---
+
+<div class="theme-controls" role="toolbar" aria-label="Theme controls">
+  <!-- Color mode toggle -->
+  <button
+    id="color-mode-toggle"
+    class="theme-btn"
+    aria-label="Toggle dark/light mode"
+    title="Toggle dark/light mode"
+  >
+    <span class="icon-sun" aria-hidden="true">
+      <Icon name="lucide:sun" width="18" height="18" />
+    </span>
+    <span class="icon-moon" aria-hidden="true">
+      <Icon name="lucide:moon" width="18" height="18" />
+    </span>
+  </button>
+
+  <!-- Theme preset picker -->
+  <div class="theme-picker" role="group" aria-label="Choose theme">
+    <button
+      class="theme-preset-btn"
+      data-preset="minimal"
+      aria-label="minimal theme"
+      title="Switch to minimal theme"
+    >
+      <Icon name="lucide:circle" width="16" height="16" />
+    </button>
+    <button
+      class="theme-preset-btn"
+      data-preset="modern"
+      aria-label="modern theme"
+      title="Switch to modern theme"
+    >
+      <Icon name="lucide:sparkles" width="16" height="16" />
+    </button>
+    <button
+      class="theme-preset-btn"
+      data-preset="neobrutalist"
+      aria-label="neobrutalist theme"
+      title="Switch to neobrutalist theme"
+    >
+      <Icon name="lucide:square" width="16" height="16" />
+    </button>
+  </div>
+</div>
+
+<script>
+  const THEME_KEY = "zutrabio-theme";
+  const COLOR_KEY = "zutrabio-color-mode";
+
+  // ── Color mode toggle ──────────────────────────────────────
+  const colorBtn = document.getElementById("color-mode-toggle");
+  const html = document.documentElement;
+
+  function updateColorBtn() {
+    const isDark = html.classList.contains("dark");
+    colorBtn?.setAttribute("aria-pressed", String(isDark));
+    colorBtn?.setAttribute("data-mode", isDark ? "dark" : "light");
+  }
+
+  colorBtn?.addEventListener("click", () => {
+    const isDark = html.classList.contains("dark");
+    html.classList.toggle("dark", !isDark);
+    html.setAttribute("data-color-mode", isDark ? "light" : "dark");
+    localStorage.setItem(COLOR_KEY, isDark ? "light" : "dark");
+    updateColorBtn();
+  });
+
+  // ── Theme preset picker ────────────────────────────────────
+  function setTheme(preset: string) {
+    html.setAttribute("data-theme", preset);
+    localStorage.setItem(THEME_KEY, preset);
+    document.querySelectorAll(".theme-preset-btn").forEach((btn) => {
+      btn.setAttribute(
+        "aria-pressed",
+        String(btn.getAttribute("data-preset") === preset)
+      );
+    });
+  }
+
+  document.querySelectorAll(".theme-preset-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const preset = btn.getAttribute("data-preset");
+      if (preset) setTheme(preset);
+    });
+  });
+
+  // ── Init ──────────────────────────────────────────────────
+  updateColorBtn();
+  const currentTheme = html.getAttribute("data-theme") || "minimal";
+  document.querySelectorAll(".theme-preset-btn").forEach((btn) => {
+    btn.setAttribute(
+      "aria-pressed",
+      String(btn.getAttribute("data-preset") === currentTheme)
+    );
+  });
+</script>

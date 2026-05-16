@@ -1,0 +1,343 @@
+---
+import type { RichMediaItem } from "@/types/config";
+export interface Props { item: RichMediaItem }
+const { item } = Astro.props;
+
+function getYouTubeId(url: string) {
+  const match = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
+  return match?.[1] ?? null;
+}
+
+function getVimeoId(url: string) {
+  const match = url.match(/vimeo\.com\/(\d+)/);
+  return match?.[1] ?? null;
+}
+
+function getTwitchChannel(url: string) {
+  const match = url.match(/twitch\.tv\/([^/?]+)/);
+  return match?.[1] ?? null;
+}
+
+function getTikTokId(url: string) {
+  const match = url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
+  return match?.[1] ?? null;
+}
+
+function getSpotifyEmbed(url: string) {
+  return url.replace("open.spotify.com/", "open.spotify.com/embed/");
+}
+
+function getSoundCloudUrl(url: string) {
+  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false`;
+}
+
+function getAppleMusicEmbed(url: string) {
+  return url.replace("music.apple.com/", "embed.music.apple.com/");
+}
+
+const ytId = item.mediaType === "youtube-video" && item.url ? getYouTubeId(item.url) : null;
+const vimeoId = item.mediaType === "vimeo-video" && item.url ? getVimeoId(item.url) : null;
+const twitchChannel = item.mediaType === "twitch-stream" && item.url ? getTwitchChannel(item.url) : null;
+const tikTokId = item.mediaType === "tiktok-video" && item.url ? getTikTokId(item.url) : null;
+
+const isSpotify = ["spotify-track", "spotify-playlist", "spotify-album"].includes(item.mediaType);
+const spotifyEmbed = isSpotify && item.url ? getSpotifyEmbed(item.url) : null;
+const spotifyIsAlbum = item.mediaType === "spotify-album";
+
+const isSoundCloud = item.mediaType === "soundcloud-track" && item.url;
+const soundCloudUrl = isSoundCloud ? getSoundCloudUrl(item.url!) : null;
+
+const isAppleMusic = item.mediaType === "apple-music" && item.url;
+const appleMusicEmbed = isAppleMusic ? getAppleMusicEmbed(item.url!) : null;
+
+const isPdf = item.mediaType === "pdf-viewer" && item.url;
+const isGoogleSlides = item.mediaType === "google-slides" && item.url;
+
+function getGoogleSlidesEmbed(url: string) {
+  return url.replace("/pub?", "/embed?").replace("/edit", "/embed");
+}
+const googleSlidesEmbed = isGoogleSlides ? getGoogleSlidesEmbed(item.url!) : null;
+
+const isVideo = item.mediaType === "video-embed" && item.url;
+---
+
+<div class={`rich-media rich-media--${item.mediaType}`}>
+  {item.label && <p class="rich-media__label">{item.label}</p>}
+
+  <!-- YouTube -->
+  {item.mediaType === "youtube-video" && ytId && (
+    <div class="rich-media__embed rich-media__embed--video">
+      <iframe
+        src={`https://www.youtube-nocookie.com/embed/${ytId}`}
+        title={item.label || "YouTube video"}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        loading="lazy"
+        class="rich-media__iframe"
+      />
+    </div>
+  )}
+
+  <!-- Vimeo -->
+  {item.mediaType === "vimeo-video" && vimeoId && (
+    <div class="rich-media__embed rich-media__embed--video">
+      <iframe
+        src={`https://player.vimeo.com/video/${vimeoId}?dnt=1&title=0&byline=0&portrait=0`}
+        title={item.label || "Vimeo video"}
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+        loading="lazy"
+        class="rich-media__iframe"
+      />
+    </div>
+  )}
+
+  <!-- Twitch (parent domain required — set via siteUrl) -->
+  {item.mediaType === "twitch-stream" && twitchChannel && (
+    <div class="rich-media__embed rich-media__embed--video">
+      <iframe
+        src={`https://player.twitch.tv/?channel=${twitchChannel}&parent=localhost&muted=true`}
+        title={item.label || `${twitchChannel} on Twitch`}
+        allowfullscreen
+        loading="lazy"
+        class="rich-media__iframe"
+      />
+    </div>
+  )}
+
+  <!-- TikTok -->
+  {item.mediaType === "tiktok-video" && tikTokId && (
+    <div class="rich-media__tiktok">
+      <iframe
+        src={`https://www.tiktok.com/embed/v2/${tikTokId}`}
+        title={item.label || "TikTok video"}
+        allow="encrypted-media"
+        loading="lazy"
+        class="rich-media__tiktok-iframe"
+  
+      />
+    </div>
+  )}
+
+  <!-- Spotify track / playlist / album -->
+  {isSpotify && spotifyEmbed && (
+    <iframe
+      src={spotifyEmbed}
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+      loading="lazy"
+      class={spotifyIsAlbum ? "rich-media__spotify rich-media__spotify--album" : "rich-media__spotify"}
+      title={item.label || "Spotify"}
+    />
+  )}
+
+  <!-- SoundCloud -->
+  {isSoundCloud && soundCloudUrl && (
+    <iframe
+      src={soundCloudUrl}
+      allow="autoplay"
+      loading="lazy"
+      class="rich-media__soundcloud"
+      title={item.label || "SoundCloud"}
+
+    />
+  )}
+
+  <!-- Apple Music -->
+  {isAppleMusic && appleMusicEmbed && (
+    <iframe
+      src={appleMusicEmbed}
+      allow="autoplay *; encrypted-media *; fullscreen *"
+      loading="lazy"
+      class="rich-media__apple-music"
+      title={item.label || "Apple Music"}
+      sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"
+    />
+  )}
+
+  <!-- PDF Viewer -->
+  {isPdf && (
+    <div class="rich-media__pdf-wrapper">
+      <iframe
+        src={`${item.url}#toolbar=0&navpanes=0`}
+        title={item.label || "PDF document"}
+        loading="lazy"
+        class="rich-media__pdf"
+      />
+      <a href={item.url} target="_blank" rel="noopener noreferrer" class="rich-media__pdf-fallback">
+        Open PDF ↗
+      </a>
+    </div>
+  )}
+
+  <!-- Google Slides -->
+  {isGoogleSlides && googleSlidesEmbed && (
+    <div class="rich-media__embed rich-media__embed--slides">
+      <iframe
+        src={googleSlidesEmbed}
+        title={item.label || "Google Slides presentation"}
+        allow="fullscreen"
+        loading="lazy"
+        class="rich-media__iframe"
+        allowfullscreen
+      />
+    </div>
+  )}
+
+  <!-- Generic HTML5 video -->
+  {isVideo && (
+    <video
+      src={item.url}
+      controls
+      preload="metadata"
+      class="rich-media__video"
+      aria-label={item.label || "Video"}
+    />
+  )}
+
+  <!-- Image gallery -->
+  {item.mediaType === "image-gallery" && item.images && (
+    <div
+      class="rich-media__gallery"
+      role="list"
+      data-gallery
+      data-images={JSON.stringify(item.images.map(img => ({ src: img.src, alt: img.alt })))}
+    >
+      {item.images.map((img, i) => (
+        <button
+          class="rich-media__gallery-item"
+          role="listitem"
+          data-index={i}
+          aria-label={`Open image ${i + 1} of ${item.images!.length}: ${img.alt}`}
+          type="button"
+        >
+          <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
+          <span class="rich-media__gallery-zoom" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+            </svg>
+          </span>
+        </button>
+      ))}
+    </div>
+  )}
+
+  {item.description && <p class="rich-media__desc">{item.description}</p>}
+</div>
+
+<!-- Lightbox (injected once into body per page, shared across all galleries) -->
+<script>
+  // ── Lightbox singleton ────────────────────────────────────────
+  if (!document.getElementById("zb-lightbox")) {
+    const lb = document.createElement("div");
+    lb.id = "zb-lightbox";
+    lb.setAttribute("role", "dialog");
+    lb.setAttribute("aria-modal", "true");
+    lb.setAttribute("aria-label", "Image viewer");
+    lb.setAttribute("aria-hidden", "true");
+    lb.innerHTML = `
+      <div class="zb-lb__backdrop"></div>
+      <div class="zb-lb__stage">
+        <button class="zb-lb__close" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <button class="zb-lb__nav zb-lb__nav--prev" aria-label="Previous image">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="zb-lb__img-wrap">
+          <img class="zb-lb__img" src="" alt="" />
+        </div>
+        <button class="zb-lb__nav zb-lb__nav--next" aria-label="Next image">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <div class="zb-lb__counter" aria-live="polite"></div>
+      </div>`;
+    document.body.appendChild(lb);
+
+    let images: { src: string; alt: string }[] = [];
+    let current = 0;
+
+    const img      = lb.querySelector(".zb-lb__img") as HTMLImageElement;
+    const counter  = lb.querySelector(".zb-lb__counter") as HTMLElement;
+    const btnClose = lb.querySelector(".zb-lb__close") as HTMLButtonElement;
+    const btnPrev  = lb.querySelector(".zb-lb__nav--prev") as HTMLButtonElement;
+    const btnNext  = lb.querySelector(".zb-lb__nav--next") as HTMLButtonElement;
+    const backdrop = lb.querySelector(".zb-lb__backdrop") as HTMLElement;
+    const imgWrap  = lb.querySelector(".zb-lb__img-wrap") as HTMLElement;
+
+    function show(index: number) {
+      current = (index + images.length) % images.length;
+      img.src = images[current].src;
+      img.alt = images[current].alt;
+      counter.textContent = `${current + 1} / ${images.length}`;
+      btnPrev.style.display = images.length <= 1 ? "none" : "";
+      btnNext.style.display = images.length <= 1 ? "none" : "";
+      // Entrance animation
+      imgWrap.classList.remove("zb-lb__img-wrap--in");
+      requestAnimationFrame(() => imgWrap.classList.add("zb-lb__img-wrap--in"));
+    }
+
+    function open(imgs: typeof images, startIndex: number) {
+      images = imgs;
+      lb.setAttribute("aria-hidden", "false");
+      lb.classList.add("zb-lb--open");
+      document.body.style.overflow = "hidden";
+      show(startIndex);
+      btnClose.focus();
+    }
+
+    function close() {
+      lb.setAttribute("aria-hidden", "true");
+      lb.classList.remove("zb-lb--open");
+      document.body.style.overflow = "";
+    }
+
+    btnClose.addEventListener("click", close);
+    backdrop.addEventListener("click", close);
+    btnPrev.addEventListener("click", () => show(current - 1));
+    btnNext.addEventListener("click", () => show(current + 1));
+
+    document.addEventListener("keydown", (e) => {
+      if (!lb.classList.contains("zb-lb--open")) return;
+      if (e.key === "Escape")     close();
+      if (e.key === "ArrowLeft")  show(current - 1);
+      if (e.key === "ArrowRight") show(current + 1);
+    });
+
+    // ── Touch / pointer swipe ──────────────────────────────────
+    let startX = 0;
+    let dragging = false;
+
+    imgWrap.addEventListener("pointerdown", (e) => {
+      startX = e.clientX;
+      dragging = true;
+      imgWrap.setPointerCapture(e.pointerId);
+    });
+
+    imgWrap.addEventListener("pointerup", (e) => {
+      if (!dragging) return;
+      dragging = false;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 50) dx < 0 ? show(current + 1) : show(current - 1);
+    });
+
+    // Expose opener for gallery items
+    (window as any).__zbLightbox = { open };
+  }
+
+  // ── Wire up gallery thumbnails ─────────────────────────────────
+  document.querySelectorAll("[data-gallery]").forEach((gallery) => {
+    if ((gallery as HTMLElement).dataset.wired) return;
+    (gallery as HTMLElement).dataset.wired = "1";
+
+    const raw = (gallery as HTMLElement).dataset.images;
+    if (!raw) return;
+    const imgs: { src: string; alt: string }[] = JSON.parse(raw);
+
+    gallery.querySelectorAll("[data-index]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idx = parseInt((btn as HTMLElement).dataset.index || "0", 10);
+        (window as any).__zbLightbox?.open(imgs, idx);
+      });
+    });
+  });
+</script>

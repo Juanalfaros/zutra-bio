@@ -1,0 +1,287 @@
+---
+import { siteConfig } from "@/site-config";
+const cfg = siteConfig.exitIntent;
+if (!cfg?.enabled) return;
+---
+
+<div
+  id="exit-popup"
+  role="dialog"
+  aria-modal="true"
+  aria-label={cfg.title}
+  aria-hidden="true"
+  class="exit-popup"
+  data-arm-delay={String(cfg.armDelay ?? 3000)}
+>
+  <!-- Backdrop — click closes the popup -->
+  <div class="exit-popup__backdrop" id="exit-popup-backdrop"></div>
+
+  <div class="exit-popup__panel">
+    {cfg.bgImage && (
+      <div
+        class="exit-popup__bg"
+        style={`background-image: url(${cfg.bgImage})`}
+        aria-hidden="true"
+      />
+    )}
+    <div class="exit-popup__overlay" aria-hidden="true" />
+
+    <div class="exit-popup__content">
+      <p class="exit-popup__eyebrow">Wait!</p>
+      <h2 class="exit-popup__title">{cfg.title}</h2>
+      {cfg.subtitle && <p class="exit-popup__subtitle">{cfg.subtitle}</p>}
+
+      <div class="exit-popup__actions">
+        <a href={cfg.cta.url} target="_blank" rel="noopener noreferrer" class="exit-popup__cta">
+          {cfg.cta.label}
+        </a>
+        {cfg.secondaryCta && (
+          <a href={cfg.secondaryCta.url} target="_blank" rel="noopener noreferrer" class="exit-popup__secondary">
+            {cfg.secondaryCta.label}
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Close button is OUTSIDE the popup div so pointer-events inheritance never blocks it -->
+<button class="exit-popup__close" id="exit-popup-close" aria-label="Close">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+    <path d="M18 6 6 18M6 6l12 12"/>
+  </svg>
+</button>
+
+<style>
+  .exit-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .exit-popup--open {
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  .exit-popup__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .exit-popup__panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 580px;
+    min-height: 340px;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
+    transform: translateY(24px) scale(0.97);
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), opacity 0.25s ease;
+    opacity: 0;
+  }
+
+  .exit-popup--open .exit-popup__panel {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  .exit-popup__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    transform: scale(1.04);
+    transition: transform 6s ease;
+  }
+
+  .exit-popup--open .exit-popup__bg {
+    transform: scale(1);
+  }
+
+  .exit-popup__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      160deg,
+      rgba(10, 6, 30, 0.72) 0%,
+      rgba(108, 71, 255, 0.45) 60%,
+      rgba(10, 6, 30, 0.88) 100%
+    );
+    pointer-events: none;
+  }
+
+  .exit-popup__close {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    /* Hidden until popup opens — JS toggles .exit-popup__close--visible */
+    pointer-events: none;
+    opacity: 0;
+    transition: background 0.15s, opacity 0.2s;
+  }
+
+  .exit-popup__close--visible {
+    pointer-events: auto;
+    opacity: 1;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .exit-popup__close:hover { background: rgba(255, 255, 255, 0.22); }
+  }
+
+  .exit-popup__content {
+    position: relative;
+    z-index: 10;
+    padding: 2.5rem 2.25rem 2.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .exit-popup__eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0;
+  }
+
+  .exit-popup__title {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+
+  .exit-popup__subtitle {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.65;
+    margin: 0.25rem 0 0;
+    max-width: 42ch;
+  }
+
+  .exit-popup__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  .exit-popup__cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.65rem 1.4rem;
+    background: #fff;
+    color: #0a0618;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .exit-popup__cta:hover { opacity: 0.88; }
+  }
+
+  .exit-popup__secondary {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.15s;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .exit-popup__secondary:hover { color: #fff; }
+  }
+
+  @media (max-width: 480px) {
+    .exit-popup__content { padding: 2rem 1.5rem 1.75rem; }
+    .exit-popup__actions { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<script>
+  function initExitPopup() {
+    const DISMISSED_KEY = "zb-exit-dismissed";
+    const popup = document.getElementById("exit-popup") as HTMLElement | null;
+    const closeBtn = document.getElementById("exit-popup-close");
+
+    if (!popup || sessionStorage.getItem(DISMISSED_KEY)) return;
+
+    const armDelay = parseInt(popup.dataset.armDelay || "3000", 10);
+    let armed = false;
+    let opened = false;
+
+    setTimeout(() => { armed = true; }, armDelay);
+
+    function openPopup() {
+      if (!armed || opened) return;
+      opened = true;
+      popup!.setAttribute("aria-hidden", "false");
+      popup!.classList.add("exit-popup--open");
+      closeBtn!.classList.add("exit-popup__close--visible");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closePopup() {
+      sessionStorage.setItem(DISMISSED_KEY, "1");
+      popup!.setAttribute("aria-hidden", "true");
+      popup!.classList.remove("exit-popup--open");
+      closeBtn!.classList.remove("exit-popup__close--visible");
+      document.body.style.overflow = "";
+    }
+
+    document.addEventListener("mouseleave", (e) => {
+      if ((e as MouseEvent).clientY <= 0) openPopup();
+    });
+
+    closeBtn!.addEventListener("click", closePopup);
+
+    popup.querySelector(".exit-popup__backdrop")!.addEventListener("click", closePopup);
+
+    document.addEventListener("keydown", (e) => {
+      if ((e as KeyboardEvent).key === "Escape" && popup!.classList.contains("exit-popup--open")) closePopup();
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initExitPopup);
+  } else {
+    initExitPopup();
+  }
+</script>

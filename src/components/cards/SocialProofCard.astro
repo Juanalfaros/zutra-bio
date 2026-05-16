@@ -1,0 +1,114 @@
+---
+import type { SocialProofItem } from "@/types/config";
+import { Icon } from "astro-icon/components";
+export interface Props { item: SocialProofItem }
+const { item } = Astro.props;
+---
+
+{item.proofType === "stats" && item.stats && (
+  <div class="social-proof social-proof--stats" role="list" aria-label="Statistics">
+    {item.stats.map((stat) => (
+      <div class="social-proof__stat" role="listitem">
+        <span class="social-proof__value">{stat.value}</span>
+        <span class="social-proof__label">{stat.label}</span>
+      </div>
+    ))}
+  </div>
+)}
+
+{item.proofType === "testimonial" && item.quote && (
+  <figure class="social-proof social-proof--testimonial">
+    <blockquote class="social-proof__quote">
+      <p>"{item.quote}"</p>
+    </blockquote>
+    <figcaption class="social-proof__author">
+      {item.authorAvatar && (
+        <img src={item.authorAvatar} alt={item.author} width="36" height="36" loading="lazy" />
+      )}
+      <div>
+        <strong>{item.author}</strong>
+        {item.authorTitle && <span class="social-proof__author-title">{item.authorTitle}</span>}
+      </div>
+    </figcaption>
+  </figure>
+)}
+
+{item.proofType === "client-logos" && item.logos && (
+  <div class="social-proof social-proof--logos">
+    {item.label && <p class="social-proof__title">{item.label}</p>}
+    <div class="social-proof__logos-grid" role="list">
+      {item.logos.map((logo) => {
+        const inner = (
+          <>
+            <span class="social-proof__logo-icon" style={`color: ${logo.color ?? "currentColor"}`}>
+              {logo.icon
+                ? <Icon name={logo.icon} width="16" height="16" />
+                : logo.src && <img src={logo.src} alt={logo.name} width="16" height="16" class="social-proof__logo-img" />
+              }
+            </span>
+            <span class="social-proof__logo-name">{logo.name}</span>
+          </>
+        );
+        return (
+          <div class="social-proof__logo" role="listitem">
+            {logo.url
+              ? <a href={logo.url} target="_blank" rel="noopener noreferrer" class="social-proof__logo-link">{inner}</a>
+              : <span class="social-proof__logo-link">{inner}</span>
+            }
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
+
+{item.proofType === "badges" && item.badges && (
+  <div class="social-proof social-proof--badges">
+    {item.label && <p class="social-proof__title">{item.label}</p>}
+    <div class="social-proof__badges-grid" role="list">
+      {item.badges.map((badge) => {
+        const inner = (
+          <>
+            <span class="social-proof__badge-icon" style={`color: ${badge.color ?? "currentColor"}`}>
+              {badge.icon
+                ? <Icon name={badge.icon} width="20" height="20" />
+                : badge.src && <img src={badge.src} alt={badge.name} width="20" height="20" class="social-proof__badge-img" />
+              }
+            </span>
+            <span class="social-proof__badge-name">{badge.name}</span>
+          </>
+        );
+        return (
+          <div class="social-proof__badge" role="listitem">
+            {badge.url
+              ? <a href={badge.url} target="_blank" rel="noopener noreferrer" class="social-proof__badge-link">{inner}</a>
+              : <span class="social-proof__badge-link">{inner}</span>
+            }
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
+
+{item.proofType === "awards" && item.awards && (
+  <div class="social-proof social-proof--awards">
+    {item.label && <p class="social-proof__title">{item.label}</p>}
+    <div class="social-proof__awards-grid" role="list">
+      {item.awards.map((award) => (
+        <div class="social-proof__award" role="listitem">
+          {award.image && (
+            <div class="social-proof__award-img">
+              <img src={award.image} alt={award.name} loading="lazy" />
+            </div>
+          )}
+          <div class="social-proof__award-info">
+            <strong class="social-proof__award-name">{award.name}</strong>
+            {award.org && <span class="social-proof__award-org">{award.org}</span>}
+            {award.year && <span class="social-proof__award-year">{award.year}</span>}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
