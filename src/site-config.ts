@@ -31,13 +31,13 @@ export const siteConfig: SiteConfig = {
   // ── Site URL ─────────────────────────────────────────────────────────────────
   siteUrl: "https://janedoe.com",
 
-  // ── Promo Banner ─────────────────────────────────────────────────────────────
+// ── Promo Banner ─────────────────────────────────────────────────────────────
   // Top-of-page announcement strip. Set enabled: false to hide it completely.
   promo: {
     enabled: true,
-    message: "✨ Built with Zutrabio — the link-in-bio Astro theme.",
+    message: "✨ Built with Zutrabio — the ultimate premium Astro link-in-bio theme.",
     cta: {
-      label: "Get it free →",
+      label: "Get Zutrabio →",
       url:   "https://zutra.gumroad.com/l/zutrabio",
     },
     dismissible: true,                 // Let visitors close the banner
@@ -163,7 +163,7 @@ export const siteConfig: SiteConfig = {
     links: [],              // [{ label: "Privacy", href: "/privacy" }]
   },
 
-  // ── Exit-Intent Popup ────────────────────────────────────────────────────────
+// ── Exit-Intent Popup ────────────────────────────────────────────────────────
   // Modal that appears when the cursor leaves the browser window (before closing).
   // Armed after `armDelay` ms so it doesn't fire immediately on page load.
   // Set enabled: false to disable.
@@ -171,11 +171,11 @@ export const siteConfig: SiteConfig = {
     enabled: true,
     armDelay: 3000,
     bgImage: "https://images.unsplash.com/photo-1558591710-4b4a1ae0f664?w=1200&q=80",
-    title: "Before you go…",
-    subtitle: "Zutrabio is free and open-source. If you like it, check out our other Astro themes and free resources for creators.",
+    title: "Don't build it from scratch!",
+    subtitle: "Saves hours of development. Get Zutrabio now and deploy your premium, 100/100 Lighthouse Link in Bio in less than 5 minutes.",
     cta: {
-      label: "Browse Free Resources →",
-      url:   "https://zutra.agency/recursos",
+      label: "Get Zutrabio Theme →",
+      url:   "https://zutra.gumroad.com/l/zutrabio",
     },
     secondaryCta: {
       label: "More Astro Themes",
