@@ -2,7 +2,7 @@
 
 > The most complete, SEO-first Link in Bio theme for Astro.
 
-[![Astro](https://img.shields.io/badge/Astro-6.3-FF5D01?logo=astro)](https://astro.build)
+[![Astro](https://img.shields.io/badge/Astro-7-FF5D01?logo=astro)](https://astro.build)
 [![Tailwind](https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
 [![Cloudflare](https://img.shields.io/badge/Cloudflare-Pages-F38020?logo=cloudflare)](https://pages.cloudflare.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
@@ -14,7 +14,7 @@
 
 ## ✨ What is Zutrabio?
 
-Zutrabio is a **production-ready Link in Bio theme** built with Astro 6. Drop in your profile, pick a theme, and deploy to Cloudflare Pages in minutes — all from a single config file. No framework knowledge required.
+Zutrabio is a **production-ready Link in Bio theme** built with Astro 7. Drop in your profile, pick a theme, and deploy to Cloudflare Pages in minutes — all from a single config file. No framework knowledge required.
 
 ---
 
