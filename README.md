@@ -135,7 +135,7 @@ Replace every placeholder value before going live:
 
 ```bash
 # 1. Clone
-git clone https://github.com/YOUR_USERNAME/zutrabio.git my-site
+git clone https://github.com/YOUR_USERNAME/zutra-bio.git my-site
 cd my-site
 
 # 2. Install
@@ -226,7 +226,7 @@ export const pageItems: PageItem[] = [
 ## 📁 Project Structure
 
 ```
-zutrabio/
+zutra-bio/
 ├── src/
 │   ├── site-config.ts            ← The only file you need to edit
 │   ├── profiles/                 ← One file per persona
