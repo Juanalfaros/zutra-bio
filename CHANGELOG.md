@@ -5,6 +5,17 @@ Follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and [Semantic V
 
 ---
 
+## [1.1.2] — 2026-10-16
+
+### Changed
+- Upgraded to **Astro 7** (7.4) with `@astrojs/cloudflare` 14, Tailwind CSS 4.3, `astro-icon` 1.2 and `sharp` 0.35.
+- Dev tooling updated: `wrangler` 4, TypeScript 6 and `@astrojs/check` 0.9.10.
+- **Node.js 22.22 or later is now required** (Astro 7.4 requirement). An `.nvmrc` and the `engines` field are included so Cloudflare Pages and local tooling pick the right version automatically.
+- Added `pnpm-workspace.yaml` with `allowBuilds` for `esbuild`, `sharp` and `workerd` so installs work with pnpm 10+.
+- README, docs and package metadata now point to zutra.cl (resources page and contact email).
+
+---
+
 ## [1.1.1] — 2026-05-16
 
 ### Fixed
