@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![Gumroad](https://img.shields.io/badge/Download-Gumroad-FF90E8?logo=gumroad)](https://zutra.gumroad.com/l/zutrabio)
 [![Astro Themes](https://img.shields.io/badge/Astro-Themes-FF5D01?logo=astro)](https://astro.build/themes/author/2995)
-[![Resources](https://img.shields.io/badge/Free-Resources-6c47ff)](https://zutra.agency/recursos)
+[![Resources](https://img.shields.io/badge/Free-Resources-6c47ff)](https://zutra.cl/recursos)
 
 ---
 
@@ -309,10 +309,10 @@ MIT — free to use, modify, and distribute.
 
 | | |
 |---|---|
-| 🎁 **Free Resources** | Guides, templates & tools for creators → [zutra.agency/recursos](https://zutra.agency/recursos) |
+| 🎁 **Free Resources** | Guides, templates & tools for creators → [zutra.cl/recursos](https://zutra.cl/recursos) |
 | 🚀 **Astro Themes** | Browse all our Astro themes → [astro.build/themes/author/2995](https://astro.build/themes/author/2995) |
 | 💜 **Get Zutrabio** | Download the full theme on Gumroad → [zutra.gumroad.com/l/zutrabio](https://zutra.gumroad.com/l/zutrabio) |
 
 ---
 
-> Built with [Astro](https://astro.build) · Deployed on [Cloudflare Pages](https://pages.cloudflare.com) · [Free Resources](https://zutra.agency/recursos) · [More Themes](https://astro.build/themes/author/2995)
+> Built with [Astro](https://astro.build) · Deployed on [Cloudflare Pages](https://pages.cloudflare.com) · [Free Resources](https://zutra.cl/recursos) · [More Themes](https://astro.build/themes/author/2995)

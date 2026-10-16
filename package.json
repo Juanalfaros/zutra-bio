@@ -12,7 +12,7 @@
     "cloudflare",
     "seo"
   ],
-  "author": "Zutra Agency <hola@zutra.agency>",
+  "author": "Zutra Agency <hola@zutra.cl>",
   "license": "MIT",
   "scripts": {
     "dev": "astro dev",
